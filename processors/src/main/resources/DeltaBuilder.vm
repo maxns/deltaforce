@@ -29,9 +29,9 @@ public $class_name from($model.className ${model.className.toLowerCase()}) { ret
     #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
     /**
 * Sets the value on the underlying and records a delta (if values are different)
-     *
-     * @return the property descriptor
-     */
+*
+* @return the property descriptor
+*/
 public $class_name set$fnInMethod(final $field.type newValue) {
 // first check if we already have a delta of this field
     ${field.boxedType} curValue;
@@ -51,12 +51,12 @@ Delta.OP op = compare(curValue, newValue);
 
 if(op!=Delta.OP.NOOP) {
 addDelta(new Delta(op, "${field.name}", curValue, newValue));
-        }
+}
 return this;
-    }
-#end
+}
+    #end
 
-    /**
+/**
 * apply deltas
 * @Override
 * @param to ${model.className} to apply deltas to
