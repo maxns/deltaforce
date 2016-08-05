@@ -1,1 +1,1 @@
-processors.BeanInfoProcessor
+org.namstorm.deltaforce.annotations.processors.DeltaBuilderProcessor

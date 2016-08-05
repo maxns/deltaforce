@@ -5,6 +5,18 @@ package org.namstorm.deltaforce.annotations.processors;
  */
 public class FieldModel {
     String name;
+    String type;
+    String boxedType;
+    boolean accessible;
+    boolean primitive;
+
+    public String getBoxedType() {
+        return boxedType;
+    }
+
+    public boolean isAccessible() {
+        return accessible;
+    }
 
     public String getType() {
         return type;
@@ -14,6 +26,5 @@ public class FieldModel {
         return name;
     }
 
-    String type;
 
 }

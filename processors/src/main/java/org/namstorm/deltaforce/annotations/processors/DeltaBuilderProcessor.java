@@ -1,37 +1,32 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import java.io.IOException;
-import java.io.Writer;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
-
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
-import javax.lang.model.SourceVersion;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.tools.Diagnostic;
-import javax.tools.JavaFileObject;
-
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.tools.generic.DisplayTool;
-
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaField;
+
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.RoundEnvironment;
+import javax.annotation.processing.SupportedAnnotationTypes;
+import javax.annotation.processing.SupportedSourceVersion;
+import javax.lang.model.SourceVersion;
+import javax.lang.model.element.*;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
+import javax.tools.JavaFileObject;
+import java.io.IOException;
+import java.io.Writer;
+import java.lang.reflect.Array;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Properties;
+import java.util.Set;
 
 /**
  * Annotation processors for DeltaBuilder annotation type. It generates a full featured
@@ -43,9 +38,11 @@ import org.namstorm.deltaforce.annotations.DeltaBuilder;
 @SupportedAnnotationTypes("org.namstorm.deltaforce.annotations.DeltaBuilder")
 @SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DeltaBuilderProcessor
-    extends AbstractProcessor {
+        extends AbstractProcessor {
 
-    /** String used to append to a class name when creating the DeltaBuilder class name. */
+    /**
+     * String used to append to a class name when creating the DeltaBuilder class name.
+     */
     private static final String BEAN_INFO = "DeltaBuilder";
 
     /**
@@ -61,8 +58,7 @@ public class DeltaBuilderProcessor
      * DeltaBuilder type with the help of an Apache Velocity template.
      *
      * @param annotations set of annotations found
-     * @param roundEnv the environment for this processors round
-     *
+     * @param roundEnv    the environment for this processors round
      * @return whether a new processors round would be needed
      */
     @Override
@@ -71,136 +67,187 @@ public class DeltaBuilderProcessor
         if (annotations.isEmpty()) {
             return true;
         }
+        Element ce = null;
+
+        HashMap<DeltaBuilderTypeModel, Map<String, FieldModel>> modelMap = new HashMap<>();
 
         try {
             DeltaBuilderTypeModel model = null;
-            Map<String, FieldModel> fields = new HashMap<>();
-            Map<String, DeltaBuilderSetterMethodModel> methods = new HashMap<>();
+            for (Element elem : roundEnv.getElementsAnnotatedWith(DeltaBuilder.class)) {
+                ce = elem;
 
-            for (Element e : roundEnv.getElementsAnnotatedWith(DeltaBuilder.class)) {
-
-                if (e.getKind() == ElementKind.CLASS) {
+                if (elem.getKind() == ElementKind.CLASS) {
 
                     model = new DeltaBuilderTypeModel();
+                    Map<String, FieldModel> fields = new HashMap<>();
+                    modelMap.put(model, fields);
 
-                    TypeElement classElement = (TypeElement) e;
+                    TypeElement classElement = (TypeElement) elem;
                     PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
                     DeltaBuilder annotation = classElement.getAnnotation(DeltaBuilder.class);
 
                     model.packageName = packageElement.getQualifiedName().toString();
                     model.className = classElement.getSimpleName().toString();
                     model.qualifiedName = classElement.getQualifiedName().toString();
+                    model.deltaBuilderClassName = model.className + annotation.builderNameSuffix();
 
                     processingEnv.getMessager().printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "annotated class: " + model.qualifiedName, e);
-
-                } else if (e.getKind() == ElementKind.FIELD) {
-
-                    VariableElement varElement = (VariableElement) e;
-
-                    FieldModel field = new FieldModel();
-                    DeltaBuilder annotation = varElement.getAnnotation(DeltaBuilder.class);
-
-                    field.name = varElement.getSimpleName().toString();
-                    field.type = varElement.asType().toString();
-
-                    fields.put(field.name, field);
-
-                    processingEnv.getMessager().printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "annotated field: " + field.name + " // field type: " + field.type, e);
-
-                } else if (e.getKind() == ElementKind.METHOD) {
-
-                    ExecutableElement exeElement = (ExecutableElement) e;
-                    List<? extends VariableElement> paramElements = exeElement.getParameters();
-                    DeltaBuilder annotation = exeElement.getAnnotation(DeltaBuilder.class);
-
-                    DeltaBuilderSetterMethodModel method = new DeltaBuilderSetterMethodModel();
-                    List<FieldModel> parameters = new ArrayList<>();
-
-                    method.name = exeElement.getSimpleName().toString();
-                    method.qualifiedType = exeElement.getReturnType().toString();
-
-                    for (VariableElement paramElement : paramElements) {
-                        FieldModel parameter = new FieldModel();
-                        DeltaBuilder paramAnnotation = paramElement.getAnnotation(DeltaBuilder.class);
-
-                        parameter.name = paramElement.getSimpleName().toString();
-                        parameter.type = paramElement.asType().toString();
-
-                        parameters.add(parameter);
-                    }
-
-                    methods.put(method.name, method);
-
-                    processingEnv.getMessager().printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "annotated method: " + method.name + " // return type: " + method.qualifiedType, e);
-                    for (FieldModel parameter : parameters) {
-                        processingEnv.getMessager().printMessage(
                             Diagnostic.Kind.NOTE,
-                            "parameter: " + parameter.name + " // parameter type: " + parameter.type, e);
+                            "annotated class: " + model.qualifiedName, elem);
+
+
+                    for (Element ec : elem.getEnclosedElements()) {
+                        if (ec.getKind() == ElementKind.FIELD) {
+
+                            VariableElement fe = (VariableElement) ec;
+                            ce = fe;
+
+                            FieldModel field = new FieldModel();
+                            DeltaField fea = fe.getAnnotation(DeltaField.class);
+
+                            if (fea == null || fea.ignore()) {
+                                field.accessible = !fe.getModifiers().contains(Modifier.PRIVATE);
+
+                                field.name = fe.getSimpleName().toString();
+                                field.type = fe.asType().toString();
+
+                                if (fe.asType().getKind().isPrimitive()) {
+                                    field.boxedType = box(fe.asType());
+                                    field.primitive = true;
+                                } else {
+                                    field.boxedType = field.type;
+                                    field.primitive = false;
+                                }
+
+                                fields.put(field.name, field);
+
+                                processingEnv.getMessager().printMessage(
+                                        Diagnostic.Kind.NOTE,
+                                        "annotated field: " + field.name + " // field type: " + field.type, elem);
+                            } else {
+                                processingEnv.getMessager().printMessage(
+                                        Diagnostic.Kind.NOTE,
+                                        "IGNORING annotated field: " + field.name + " // field type: " + field.type, elem);
+
+                            }
+
+                        }
                     }
+
+
                 }
             }
 
-            if (model != null) {
+            if (modelMap.size() > 0) {
 
-                Properties props = new Properties();
-                URL url = this.getClass().getClassLoader().getResource("velocity.properties");
-                props.load(url.openStream());
+                for (DeltaBuilderTypeModel tm : modelMap.keySet()) {
+                    writeBuilder(tm, modelMap.get(tm));
+                }
 
-                VelocityEngine ve = new VelocityEngine(props);
-                ve.init();
-
-                VelocityContext vc = new VelocityContext();
-
-                vc.put("model", model);
-                vc.put("fields", fields);
-                vc.put("methods", methods);
-
-                // adding DisplayTool from Velocity Tools library
-                vc.put("display", new DisplayTool());
-
-                Template vt = ve.getTemplate("DeltaBuilder.vm");
-
-                JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
-                    model.qualifiedName);
-
-                processingEnv.getMessager().printMessage(
-                    Diagnostic.Kind.NOTE,
-                    "creating source file: " + jfo.toUri());
-
-                Writer writer = jfo.openWriter();
-
-                processingEnv.getMessager().printMessage(
-                    Diagnostic.Kind.NOTE,
-                    "applying velocity template: " + vt.getName());
-
-                vt.merge(vc, writer);
-
-                writer.close();
             }
         } catch (ResourceNotFoundException rnfe) {
             processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.ERROR,
-                rnfe.getLocalizedMessage());
+                    Diagnostic.Kind.ERROR,
+                    rnfe.getLocalizedMessage());
         } catch (ParseErrorException pee) {
             processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.ERROR,
-                pee.getLocalizedMessage());
+                    Diagnostic.Kind.ERROR,
+                    pee.getLocalizedMessage());
         } catch (IOException ioe) {
             processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.ERROR,
-                ioe.getLocalizedMessage());
+                    Diagnostic.Kind.ERROR,
+                    ioe.getLocalizedMessage());
         } catch (Exception e) {
             processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.ERROR,
-                e.getLocalizedMessage());
+                    Diagnostic.Kind.ERROR,
+                    e.getLocalizedMessage(),
+                    ce);
         }
 
         return true;
+    }
+
+    protected void writeBuilder(DeltaBuilderTypeModel model, Map<String, FieldModel> fields) throws Exception {
+
+        Properties props = new Properties();
+        URL url = this.getClass().getClassLoader().getResource("velocity.properties");
+        props.load(url.openStream());
+
+        VelocityEngine ve = new VelocityEngine(props);
+        ve.init();
+
+        VelocityContext vc = new VelocityContext();
+
+        vc.put("generatorClassName", this.getClass().toString());
+        vc.put("model", model);
+        vc.put("fields", fields);
+
+        // adding DisplayTool from Velocity Tools library
+        vc.put("display", new DisplayTool());
+
+        Template vt = ve.getTemplate("DeltaBuilder.vm");
+
+        JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
+                model.getDeltaBuilderClassName());
+
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.NOTE,
+                "creating source file: " + jfo.toUri());
+
+        Writer writer = jfo.openWriter();
+
+        printNote("applying velocity template: " + vt.getName());
+
+        vt.merge(vc, writer);
+
+        writer.close();
+    }
+
+    private void printNote(String msg) {
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.NOTE, msg);
+    }
+
+
+    private String box(TypeMirror typeMirror) {
+
+
+        if (typeMirror.getKind().isPrimitive()) {
+            printNote("boxing:" + typeMirror.getKind().name());
+            Class res = autobox(typeMirror.getKind());
+
+            return res == null ? "Object" : res.getName();
+        }
+
+        return typeMirror.toString();
+
+    }
+
+    public static Class autobox(TypeKind kind) {
+
+        switch (kind) {
+            case INT:
+                return Integer.class;
+            case ARRAY:
+                return Array.class;
+            case BOOLEAN:
+                return Boolean.class;
+            case DOUBLE:
+                return Double.class;
+            case BYTE:
+                return Byte.class;
+            case CHAR:
+                return Character.class;
+            case FLOAT:
+                return Float.class;
+            case LONG:
+                return Long.class;
+            case SHORT:
+                return Short.class;
+            case ERROR:
+                return Error.class;
+            default:
+                return null;
+        }
     }
 }

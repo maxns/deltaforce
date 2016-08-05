@@ -3,10 +3,7 @@ package org.namstorm.deltaforce.annotations;
 import java.lang.annotation.*;
 
 /**
- * The DeltaBuilder annotation type, marks a class to be enabled for DeltaBuilder
- *
- * @author maxns
- * @version 1.0
+ * Created by maxnam-storm on 5/8/2016.
  */
 @Documented
 @Target({
@@ -15,10 +12,6 @@ import java.lang.annotation.*;
         ElementType.METHOD
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface DeltaBuilder {
-
-
-    String builderNameSuffix() default "Builder";
-
-
+public @interface DeltaField {
+    boolean ignore() default false;
 }

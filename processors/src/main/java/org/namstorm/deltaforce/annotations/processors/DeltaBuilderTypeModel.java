@@ -17,10 +17,8 @@ public class DeltaBuilderTypeModel {
     /** The class fully qualified name. */
     String qualifiedName;
 
-    /** The BeanInfo class simple name. */
     String deltaBuilderClassName;
 
-    /** The BeanInfo class fully qualified name. */
     String deltaBuilderQualifiedName;
 
     /**
