@@ -38,9 +38,6 @@ public class ComplexPerson {
         return intValues;
     }
 
-    public Map getMeta() {
-        return meta;
-    }
 
     int intValue;
     short shortValue;
@@ -65,7 +62,11 @@ public class ComplexPerson {
     }
 
     @DeltaField(ignore = true)
-    Map meta;
+    Map transientMap;
+
+    @DeltaField(mapItem = "metaValue")
+    Map metaValues;
+
 
 
 }

@@ -15,7 +15,7 @@ import javax.annotation.processing.SupportedAnnotationTypes;
 import javax.annotation.processing.SupportedSourceVersion;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
-import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
@@ -23,10 +23,7 @@ import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Array;
 import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Properties;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Annotation processors for DeltaBuilder annotation type. It generates a full featured
@@ -102,34 +99,29 @@ public class DeltaBuilderProcessor
                             VariableElement fe = (VariableElement) ec;
                             ce = fe;
 
-                            FieldModel field = new FieldModel();
                             DeltaField fea = fe.getAnnotation(DeltaField.class);
 
-                            if (fea == null || fea.ignore()) {
-                                field.accessible = !fe.getModifiers().contains(Modifier.PRIVATE);
-
-                                field.name = fe.getSimpleName().toString();
-                                field.type = fe.asType().toString();
-
-                                if (fe.asType().getKind().isPrimitive()) {
-                                    field.boxedType = box(fe.asType());
-                                    field.primitive = true;
-                                } else {
-                                    field.boxedType = field.type;
-                                    field.primitive = false;
+                            if (fea != null) {
+                                if (fea.ignore()) {
+                                    printNote("ignoring annotated field: " + fe.toString(), elem);
+                                    continue;
                                 }
-
-                                fields.put(field.name, field);
-
-                                processingEnv.getMessager().printMessage(
-                                        Diagnostic.Kind.NOTE,
-                                        "annotated field: " + field.name + " // field type: " + field.type, elem);
-                            } else {
-                                processingEnv.getMessager().printMessage(
-                                        Diagnostic.Kind.NOTE,
-                                        "IGNORING annotated field: " + field.name + " // field type: " + field.type, elem);
-
                             }
+
+                            FieldModel field = createFieldModel(fe, fea);
+
+                            field.accessible = !fe.getModifiers().contains(Modifier.PRIVATE);
+
+                            field.name = fe.getSimpleName().toString();
+
+                            field = box(field, fe.asType());
+
+                            fields.put(field.name, field);
+
+                            processingEnv.getMessager().printMessage(
+                                    Diagnostic.Kind.NOTE,
+                                    "annotated field: " + field.name + " // field type: " + field.type, elem);
+
 
                         }
                     }
@@ -167,6 +159,54 @@ public class DeltaBuilderProcessor
         return true;
     }
 
+    /**
+     * Figure out which model to use
+     *
+     * @param ve
+     * @param dfa
+     * @return
+     */
+    private FieldModel createFieldModel(VariableElement ve, DeltaField dfa) {
+        FieldModel res;
+
+        if (ve.asType().getKind().toString() == "java.util.Map") {
+            MapFieldModel mapRes = new MapFieldModel();
+
+            DeclaredType ty = (DeclaredType) ve.asType();
+
+
+            mapRes.keyModel = new FieldModel();
+            mapRes.keyModel.type = "Object";
+            mapRes.valueModel = new FieldModel();
+            mapRes.valueModel.type = "Object";
+
+            // if we got T params
+            List<? extends TypeMirror> Targs = ty.getTypeArguments();
+            if (Targs.size() == 2) {
+                mapRes.keyModel = box(mapRes.keyModel, Targs.get(0));
+                mapRes.valueModel = box(mapRes.valueModel, Targs.get(1));
+            } else {
+                printWarn("Got an irregular number of type args in Map defi, ignoring", ve);
+            }
+
+            res = mapRes;
+
+
+        } else {
+            res = new FieldModel();
+        }
+
+        return res;
+    }
+
+
+    /**
+     * Actually writes the model
+     *
+     * @param model
+     * @param fields
+     * @throws Exception
+     */
     protected void writeBuilder(DeltaBuilderTypeModel model, Map<String, FieldModel> fields) throws Exception {
 
         Properties props = new Properties();
@@ -190,42 +230,52 @@ public class DeltaBuilderProcessor
         JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
                 model.getDeltaBuilderClassName());
 
-        processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.NOTE,
-                "creating source file: " + jfo.toUri());
+        printNote("creating source file: " + jfo.toUri(), null);
 
         Writer writer = jfo.openWriter();
 
-        printNote("applying velocity template: " + vt.getName());
+        printNote("applying velocity template: " + vt.getName(), null);
 
         vt.merge(vc, writer);
 
         writer.close();
     }
 
-    private void printNote(String msg) {
+    private void printNote(String msg, Element elem) {
         processingEnv.getMessager().printMessage(
-                Diagnostic.Kind.NOTE, msg);
+                Diagnostic.Kind.NOTE, msg, elem);
+    }
+
+    private void printWarn(String s, Element elem) {
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.WARNING, s, elem);
     }
 
 
-    private String box(TypeMirror typeMirror) {
+    private FieldModel box(FieldModel keyModel, TypeMirror typeMirror) {
 
+        keyModel.type = typeMirror.toString();
 
         if (typeMirror.getKind().isPrimitive()) {
-            printNote("boxing:" + typeMirror.getKind().name());
-            Class res = autobox(typeMirror.getKind());
+            keyModel.primitive = true;
 
-            return res == null ? "Object" : res.getName();
+            printNote("boxing:" + typeMirror.getKind().name(), null);
+
+            keyModel.boxedType = autobox(typeMirror).getName();
+
+        } else {
+            keyModel.boxedType = keyModel.type;
+
+            keyModel.primitive = true;
+
         }
-
-        return typeMirror.toString();
+        return keyModel;
 
     }
 
-    public static Class autobox(TypeKind kind) {
+    public Class autobox(TypeMirror mirror) {
 
-        switch (kind) {
+        switch (mirror.getKind()) {
             case INT:
                 return Integer.class;
             case ARRAY:
@@ -247,7 +297,12 @@ public class DeltaBuilderProcessor
             case ERROR:
                 return Error.class;
             default:
-                return null;
+                try {
+                    return Class.forName(mirror.toString());
+                } catch (ClassNotFoundException e) {
+                    printWarn("Failed to autobox from " + mirror, null);
+                    return Object.class;
+                }
         }
     }
 }

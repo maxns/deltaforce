@@ -5,6 +5,10 @@ package org.namstorm.deltaforce.annotations.processors;
  * <p>
  * This one will
  */
-public class MapFieldValue extends FieldModel {
+public class MapFieldModel extends FieldModel {
 
+    String mapItem;
+
+    FieldModel keyModel;
+    FieldModel valueModel;
 }
