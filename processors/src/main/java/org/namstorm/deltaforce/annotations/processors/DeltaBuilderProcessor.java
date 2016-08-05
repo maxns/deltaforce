@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
@@ -110,12 +111,6 @@ public class DeltaBuilderProcessor
 
                             FieldModel field = createFieldModel(fe, fea);
 
-                            field.accessible = !fe.getModifiers().contains(Modifier.PRIVATE);
-
-                            field.name = fe.getSimpleName().toString();
-
-                            field = box(field, fe.asType());
-
                             fields.put(field.name, field);
 
                             processingEnv.getMessager().printMessage(
@@ -166,25 +161,33 @@ public class DeltaBuilderProcessor
      * @param dfa
      * @return
      */
+    static final String MAP_CLASS = HashMap.class.getCanonicalName();
+
     private FieldModel createFieldModel(VariableElement ve, DeltaField dfa) {
         FieldModel res;
 
-        if (ve.asType().getKind().toString() == "java.util.Map") {
+
+        if ( StringUtils.startsWith(ve.asType().toString(), MAP_CLASS) ) {
+
             MapFieldModel mapRes = new MapFieldModel();
 
             DeclaredType ty = (DeclaredType) ve.asType();
 
+            mapRes.mapItem = dfa.mapItem();
 
-            mapRes.keyModel = new FieldModel();
-            mapRes.keyModel.type = "Object";
-            mapRes.valueModel = new FieldModel();
-            mapRes.valueModel.type = "Object";
+            mapRes.key = new FieldModel();
+
+            mapRes.key.type = "Object";
+            mapRes.value = new FieldModel();
+            mapRes.value.type = "Object";
+            mapRes.type = ve.asType().toString();
+            mapRes.boxedType = mapRes.type;
 
             // if we got T params
             List<? extends TypeMirror> Targs = ty.getTypeArguments();
             if (Targs.size() == 2) {
-                mapRes.keyModel = box(mapRes.keyModel, Targs.get(0));
-                mapRes.valueModel = box(mapRes.valueModel, Targs.get(1));
+                mapRes.key = box(mapRes.key, Targs.get(0));
+                mapRes.value = box(mapRes.value, Targs.get(1));
             } else {
                 printWarn("Got an irregular number of type args in Map defi, ignoring", ve);
             }
@@ -194,7 +197,14 @@ public class DeltaBuilderProcessor
 
         } else {
             res = new FieldModel();
+            res = box(res, ve.asType());
         }
+
+        res.accessible = !ve.getModifiers().contains(Modifier.PRIVATE);
+
+        res.name = ve.getSimpleName().toString();
+
+        printNote("created field model:" + res.toString(), ve);
 
         return res;
     }
@@ -252,24 +262,24 @@ public class DeltaBuilderProcessor
     }
 
 
-    private FieldModel box(FieldModel keyModel, TypeMirror typeMirror) {
+    private FieldModel box(FieldModel field, TypeMirror typeMirror) {
 
-        keyModel.type = typeMirror.toString();
+        field.type = typeMirror.toString();
 
         if (typeMirror.getKind().isPrimitive()) {
-            keyModel.primitive = true;
+            field.primitive = true;
 
             printNote("boxing:" + typeMirror.getKind().name(), null);
 
-            keyModel.boxedType = autobox(typeMirror).getName();
+            field.boxedType = autobox(typeMirror).getName();
 
         } else {
-            keyModel.boxedType = keyModel.type;
+            field.boxedType = field.type;
 
-            keyModel.primitive = true;
+            field.primitive = true;
 
         }
-        return keyModel;
+        return field;
 
     }
 

@@ -24,5 +24,5 @@ public @interface DeltaField {
      * <p>
      * If not provided, the builder will call them set{FieldName>}Value
      */
-    String mapItem() default "";
+    String mapItem() default "+Value";
 }

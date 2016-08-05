@@ -28,6 +28,12 @@
 
     <dependencies>
         <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commonons-lang3</artifactId>
+            <version>3.4</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
             <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>annotations</artifactId>
             <version>1.0-SNAPSHOT</version>

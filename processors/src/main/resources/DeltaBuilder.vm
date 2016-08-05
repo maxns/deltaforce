@@ -18,59 +18,122 @@ import javax.annotation.Generated;
 @Generated(value="$generatorClassName")
 public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
-public $class_name($model.className from) {super(from);}
+    public $class_name($model.className from) {super(from);}
 
-protected $model.className result() { return ($model.className) super.result(); }
+    protected $model.className result() { return ($model.className) super.result(); }
 
-public $class_name from($model.className ${model.className.toLowerCase()}) { return ($class_name) super.from(${model.className.toLowerCase()}); }
+    public $class_name from($model.className ${model.className.toLowerCase()}) { return ($class_name) super.from(${model.className.toLowerCase()}); }
 
 #foreach($field in $fields)
 
-    #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+    // AccessorType : ${field.accessorType}
+    #if( ${field.accessorType} == "field" )
+        #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
     /**
-* Sets the value on the underlying and records a delta (if values are different)
-*
-* @return the property descriptor
-*/
-public $class_name set$fnInMethod(final $field.type newValue) {
-// first check if we already have a delta of this field
-    ${field.boxedType} curValue;
+    * Sets the value on the underlying and records a delta (if values are different)
+    *
+    * @return the property descriptor
+    */
+    public $class_name set$fnInMethod(final $field.type newValue) {
 
-if(deltaMap().containsKey("${field.name}")) {
-curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
-}else {
-    #if( ${field.primitive} )
-    curValue = ${field.boxedType}.valueOf( result().get}$fnInMethod() );
-    #else
-    curValue = result().get$fnInMethod();
+
+        // first check if we already have a delta of this field
+        ${field.boxedType} curValue;
+
+        if(deltaMap().containsKey("${field.name}")) {
+            curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
+        }else {
+            #if( ${field.primitive} )
+            curValue = ${field.boxedType}.valueOf( result().get}$fnInMethod() );
+            #else
+            curValue = result().get$fnInMethod();
+            #end
+
+        }
+
+        Delta.OP op = compare(curValue, newValue);
+
+        if(op!=Delta.OP.NOOP) {
+            addDelta(new Delta(op, "${field.name}", curValue, newValue));
+        }
+        return this;
+    }
+    #elseif( ${field.accessorType}=="map" )
+        #if( ${field.mapItem.substring(0,1)}=="+" )
+            #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
+        #else
+            #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
+        #end
+
+    public $class_name set$fnInMethod(final ${field.key.type} key, final ${field.value.type} value) {
+
+        ${field.value.boxedType} curValue;
+
+        // get existing value
+        #if( ${field.primitive} )
+        curValue = ${field.boxedType}.valueOf( result().get}$fnInMethod(key) );
+        #else
+        curValue = result().get$fnInMethod(key);
+        #end
+
+        Delta.OP op = compare(curValue, value);
+
+        if(op!=Delta.OP.NOOP) {
+            // prepare map for deltas
+            ${field.type} mapval = null;
+
+            if(deltaMap().containsKey("${field.name}")) {
+                mapval = (${field.type}) deltaMap().get("${field.name}").getOldValue();
+            }
+            mapval = (mapval==null) ? new ${field.type}() : mapval;
+            mapval.put(key, value);
+
+            addDelta(new Delta(op, "${field.name}", mapval, mapval));
+        }
+
+        return this;
+    }
     #end
-
-}
-
-Delta.OP op = compare(curValue, newValue);
-
-if(op!=Delta.OP.NOOP) {
-addDelta(new Delta(op, "${field.name}", curValue, newValue));
-}
-return this;
-}
-    #end
-
-/**
-* apply deltas
-* @Override
-* @param to ${model.className} to apply deltas to
-* @return ${model.className} to object with deltas applies
-*/
-public ${model.className} apply(${model.className} to) {
-
-#foreach($field in $fields)
-    #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
-
-if(deltaMap().containsKey("${field.name}")) to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$fnInMethod( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
 #end
 
-return to;
+    /**
+    * apply deltas
+    * @Override
+    * @param to ${model.className} to apply deltas to
+    * @return ${model.className} to object with deltas applies
+    */
+    public ${model.className} apply(${model.className} to) {
+
+        #foreach($field in $fields)
+            #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+
+            if(deltaMap().containsKey("${field.name}")){
+            #if( ${field.accessorType} == "field" )
+                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$fnInMethod( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+
+            #elseif (${field.accessorType} == "map")
+                #if( ${field.mapItem.substring(0,1)}=="+" )
+                    #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
+                #else
+                    #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
+                #end
+
+            ${field.type} map = (${field.type}) deltaMap().get("${field.name}").getNewValue();
+
+                #if( ${field.accessible} )
+                to.${field.name}.putAll(map);
+                #else
+                for(${field.key.boxedType} key: map ) {
+                    to.set$fnInMethod(key, map.get(key));
+                }
+                #end
+
+
+            #end
+            }
+        #end
+
+        return to;
 
     }
 
