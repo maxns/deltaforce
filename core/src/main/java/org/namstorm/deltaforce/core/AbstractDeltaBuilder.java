@@ -14,34 +14,62 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
 
     private T result;
 
-    private Map<String, Delta<?>> deltaMap = new HashMap<String, Delta<?>>();
+    private DeltaMap deltaMap;
 
+    public AbstractDeltaBuilder() {
+        super();
+
+    }
     public AbstractDeltaBuilder(T from) {
         super();
+
         from(from);
     }
-
-    protected void addDelta(Delta<?> delta) {
-        deltaMap.put(delta.getFieldName(), delta);
-    }
-
     public AbstractDeltaBuilder<T> from(T from) {
         this.result = from;
         return this;
     }
 
-    public void visitDeltas(DeltaVisitor visitor) {
-        for (Delta<?> delta : deltaMap.values()) {
-            visitor.visit(delta.getOp(), delta.getFieldName(), delta.getNewValue());
+    protected void addDelta(Delta<?> delta) {
+        deltaMap.addDelta(delta.getFieldName(), delta);
+    }
+
+    protected void addMapDelta(String mapFieldName, Map curMap, Delta<?> fieldDelta) {
+        DeltaMap map = (DeltaMap) deltaMap().map().get(mapFieldName);
+
+        if(map==null) {
+            map = new DeltaMap(mapFieldName, curMap);
+            addDelta(map);
         }
+        map.addDelta(fieldDelta.getFieldName(), fieldDelta);
+    }
+
+    protected void applyToMap(DeltaMap from, Map to) {
+        DeltaUtil.applyMapDeltas(from, to);
+    }
+
+    public void visitDeltas(DeltaVisitor visitor) {
+        DeltaUtil.visitDeltas(deltaMap(), visitor);
     }
 
     protected T result() {
         return result;
     }
 
-    protected Map<String, Delta<?>> deltaMap() {
-        return deltaMap;
+    /**
+     * by default this is just a getter with lazy construction
+     * @return
+     */
+    protected DeltaMap deltaMap() {
+        return deltaMap == null ? deltaMap = createDeltaMap() : deltaMap;
+    }
+
+    /**
+     * creates a DeltaMap, but since this is a root element, it has the fieldName set to current class name
+     * @return
+     */
+    protected DeltaMap createDeltaMap() {
+        return new DeltaMap(this.getClass().toString(),null);
     }
 
 

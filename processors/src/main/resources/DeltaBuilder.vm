@@ -3,6 +3,7 @@ package ${model.packageName};
 
 import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
 import org.namstorm.deltaforce.core.Delta;
+import org.namstorm.deltaforce.core.DeltaMap;
 import javax.annotation.Generated;
 
 /**
@@ -79,16 +80,7 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
         Delta.OP op = compare(curValue, value);
 
         if(op!=Delta.OP.NOOP) {
-            // prepare map for deltas
-            ${field.type} mapval = null;
-
-            if(deltaMap().containsKey("${field.name}")) {
-                mapval = (${field.type}) deltaMap().get("${field.name}").getOldValue();
-            }
-            mapval = (mapval==null) ? new ${field.type}() : mapval;
-            mapval.put(key, value);
-
-            addDelta(new Delta(op, "${field.name}", mapval, mapval));
+            addMapDelta("${field.name}", #if( ${field.accessible} ) result().${field.name} #else null #end, new Delta(op, key, curValue, value));
         }
 
         return this;
@@ -118,10 +110,10 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
                     #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
                 #end
 
-            ${field.type} map = (${field.type}) deltaMap().get("${field.name}").getNewValue();
+            DeltaMap map = (DeltaMap) deltaMap().get("${field.name}");
 
                 #if( ${field.accessible} )
-                to.${field.name}.putAll(map);
+                    applyToMap(map, to.${field.name});
                 #else
                 for(${field.key.boxedType} key: map ) {
                     to.set$fnInMethod(key, map.get(key));

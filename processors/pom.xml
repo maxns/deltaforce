@@ -27,12 +27,14 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
         <dependency>
             <groupId>org.apache.commons</groupId>
-            <artifactId>commonons-lang3</artifactId>
+            <artifactId>commons-lang3</artifactId>
             <version>3.4</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>annotations</artifactId>
