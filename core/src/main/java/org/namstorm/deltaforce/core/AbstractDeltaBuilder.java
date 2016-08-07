@@ -1,6 +1,5 @@
 package org.namstorm.deltaforce.core;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,7 +11,7 @@ import java.util.Map;
  */
 public abstract class AbstractDeltaBuilder<T extends Object> {
 
-    private T result;
+    private T from;
 
     private DeltaMap deltaMap;
 
@@ -20,20 +19,48 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
         super();
 
     }
-    public AbstractDeltaBuilder(T from) {
+
+    /**
+     * initialises the from
+     *
+     * @param from
+     */
+    protected AbstractDeltaBuilder(T from) {
         super();
 
         from(from);
     }
+
+    /**
+     * All deltas from now on will be vs this object
+     *
+     * @param from
+     * @return
+     */
     public AbstractDeltaBuilder<T> from(T from) {
-        this.result = from;
+        this.from = from;
         return this;
     }
 
+    protected T _from() {
+        return from == null? (from=create()):from;
+    }
+
+    /**
+     * Adds a delta
+     * @param delta
+     */
     protected void addDelta(Delta<?> delta) {
         deltaMap.addDelta(delta.getFieldName(), delta);
     }
 
+    /**
+     * adds a delta within a map
+     *
+     * @param mapFieldName
+     * @param curMap
+     * @param fieldDelta
+     */
     protected void addMapDelta(String mapFieldName, Map curMap, Delta<?> fieldDelta) {
         DeltaMap map = (DeltaMap) deltaMap().map().get(mapFieldName);
 
@@ -44,16 +71,27 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
         map.addDelta(fieldDelta.getFieldName(), fieldDelta);
     }
 
+    /**
+     * applies delta to map
+     *
+     * @param from
+     * @param to
+     */
     protected void applyToMap(DeltaMap from, Map to) {
         DeltaUtil.applyMapDeltas(from, to);
     }
 
+    /**
+     * Visit all deltas
+     * @see DeltaVisitor
+     * @param visitor
+     */
     public void visitDeltas(DeltaVisitor visitor) {
         DeltaUtil.visitDeltas(deltaMap(), visitor);
     }
 
     protected T result() {
-        return result;
+        return from;
     }
 
     /**
@@ -73,18 +111,35 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
     }
 
 
+    /**
+     * Applies collected deltas to a new object (which gets created on the spot)
+     *
+     * @see .apply(T)
+     * @see .create()
+     *
+     * @return
+     */
     public T build() {
-        return apply(result());
+        return apply(create());
     }
 
     /**
-     * This will be generated
+     * applies deltas to an object to
      *
-     * @param to
-     * @return result
+     * @param to object to which to apply this
+     * @return from
      */
-    protected abstract T apply(T to);
+    public abstract T apply(T to);
 
+    /**
+     * creates a new object
+     *
+     * @see T .build()
+     * @see T .apply(T)
+     *
+     * @return
+     */
+    public abstract T create();
 
     /**
      * does comparison of objects

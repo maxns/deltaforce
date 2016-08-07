@@ -1,6 +1,7 @@
 package org.namstorm.deltaforce.samples;
 
 import junit.framework.TestCase;
+import org.junit.Test;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
@@ -19,6 +20,7 @@ public class ComplexPersonTest extends TestCase {
     public static final String VAL_META_VALUE2 = "metaValue2";
 
 
+    @Test
     public void testSetters() throws Exception {
         ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
                 .setByteValue(VAL_BYTE)
@@ -43,11 +45,19 @@ public class ComplexPersonTest extends TestCase {
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .setMetaValue(VAL_META_NAME2, VAL_META_VALUE2)
-                .build();
+                .apply(testPerson);
 
-        assertEquals(VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
-        assertEquals(VAL_META_VALUE2, testPerson.getMetaValue(VAL_META_NAME2));
+        assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
+        assertEquals("New meta value setup", VAL_META_VALUE2, testPerson.getMetaValue(VAL_META_NAME2));
 
+        // now lets remove it
+
+        new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
+                .setMetaValue(VAL_META_NAME2, null)
+                .apply(testPerson);
+
+        assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
+        assertNull("Nulling of " + VAL_META_NAME2, testPerson.getMetaValue(VAL_META_NAME2));
 
 
     }
