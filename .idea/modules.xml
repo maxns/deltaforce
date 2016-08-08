@@ -6,6 +6,7 @@
       <module fileurl="file://$PROJECT_DIR$/processors/annotations.processors.iml" filepath="$PROJECT_DIR$/processors/annotations.processors.iml" />
       <module fileurl="file://$PROJECT_DIR$/core/core.iml" filepath="$PROJECT_DIR$/core/core.iml" />
       <module fileurl="file://$PROJECT_DIR$/deltaforce.iml" filepath="$PROJECT_DIR$/deltaforce.iml" />
+      <module fileurl="file://$PROJECT_DIR$/ledgers/ledgers.iml" filepath="$PROJECT_DIR$/ledgers/ledgers.iml" />
       <module fileurl="file://$PROJECT_DIR$/samples/samples.iml" filepath="$PROJECT_DIR$/samples/samples.iml" />
     </modules>
   </component>
