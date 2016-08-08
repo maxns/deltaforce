@@ -11,10 +11,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <name>org.namstorm.deltaforce.samples</name>
-    <artifactId>samples</artifactId>
-    <groupId>${parent.groupId}</groupId>
-    <version>${parent.version}</version>
+    <name>samples</name>
+    <artifactId>deltaforce-samples</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
 
     <build>

@@ -11,10 +11,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <name>org.namstorm.deltaforce.annotations</name>
-    <artifactId>annotations</artifactId>
-    <groupId>${parent.groupId}</groupId>
-    <version>${parent.version}</version>
+    <name>annotations</name>
+    <artifactId>deltaforce-annotations</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
 
     <build>

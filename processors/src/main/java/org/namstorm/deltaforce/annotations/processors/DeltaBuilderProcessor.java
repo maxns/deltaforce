@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -10,10 +11,7 @@ import org.apache.velocity.tools.generic.DisplayTool;
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
-import javax.annotation.processing.AbstractProcessor;
-import javax.annotation.processing.RoundEnvironment;
-import javax.annotation.processing.SupportedAnnotationTypes;
-import javax.annotation.processing.SupportedSourceVersion;
+import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
@@ -30,26 +28,51 @@ import java.util.*;
  * Annotation processors for DeltaBuilder annotation type. It generates a full featured
  * DeltaBuilder type with the help of an Apache Velocity template.
  *
- * @author deors
  * @version 1.0
  */
-@SupportedAnnotationTypes("org.namstorm.deltaforce.annotations.DeltaBuilder")
-@SupportedSourceVersion(SourceVersion.RELEASE_8)
 public class DeltaBuilderProcessor
         extends AbstractProcessor {
 
-    /**
-     * String used to append to a class name when creating the DeltaBuilder class name.
-     */
-    private static final String BEAN_INFO = "DeltaBuilder";
+    /** keeping it plain, avoiding Android issues */
+    static HashSet<String> SUPPORTED_TYPES = new HashSet<>(Arrays.asList("org.namstorm.deltaforce.annotations.DeltaBuilder"));
+    private Properties properties;
+    private VelocityEngine velocityEngine;
+
+    @Override
+    public Set<String> getSupportedAnnotationTypes() {
+        return SUPPORTED_TYPES;
+    }
+
+    @Override
+    public SourceVersion getSupportedSourceVersion() {
+        return SourceVersion.latestSupported();
+    }
 
     /**
      * Default constructor.
      */
     public DeltaBuilderProcessor() {
-
         super();
     }
+
+    @Override
+    public synchronized void init(ProcessingEnvironment processingEnv) {
+        super.init(processingEnv);
+        processingEnv.getMessager().printMessage(Diagnostic.Kind.NOTE, "Initialising " + this.toString());
+
+        try {
+            properties = new Properties();
+            URL url = this.getClass().getClassLoader().getResource("velocity.properties");
+            properties.load(url.openStream());
+
+            velocityEngine = new VelocityEngine(properties);
+            velocityEngine.init();
+
+        }catch (Exception e) {
+            printError("Failed to initialise velocity engine:" + e.toString(), null);
+        }
+    }
+
 
     /**
      * Reads the DeltaBuilder information and writes a full featured
@@ -219,12 +242,6 @@ public class DeltaBuilderProcessor
      */
     protected void writeBuilder(DeltaBuilderTypeModel model, Map<String, FieldModel> fields) throws Exception {
 
-        Properties props = new Properties();
-        URL url = this.getClass().getClassLoader().getResource("velocity.properties");
-        props.load(url.openStream());
-
-        VelocityEngine ve = new VelocityEngine(props);
-        ve.init();
 
         VelocityContext vc = new VelocityContext();
 
@@ -235,7 +252,7 @@ public class DeltaBuilderProcessor
         // adding DisplayTool from Velocity Tools library
         vc.put("display", new DisplayTool());
 
-        Template vt = ve.getTemplate("DeltaBuilder.vm");
+        Template vt = velocityEngine.getTemplate("DeltaBuilder.vm");
 
         JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
                 model.getDeltaBuilderClassName());
@@ -249,6 +266,12 @@ public class DeltaBuilderProcessor
         vt.merge(vc, writer);
 
         writer.close();
+    }
+
+    private void printError(String s, Element e) {
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.ERROR, s, e);
+
     }
 
     private void printNote(String msg, Element elem) {

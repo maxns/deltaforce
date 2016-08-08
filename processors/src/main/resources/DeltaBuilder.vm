@@ -46,7 +46,7 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
             curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
         }else {
         #if( ${field.primitive} )
-            curValue = ${field.boxedType}.valueOf( _from().get}$fnInMethod() );
+            curValue = ${field.boxedType}.valueOf( _from().get$fnInMethod() );
         #else
             curValue = _from().get$fnInMethod();
         #end

@@ -11,10 +11,9 @@
         <version>1.0-SNAPSHOT</version>
     </parent>
 
-    <name>org.namstorm.deltaforce.annotations.processors</name>
-    <artifactId>annotations.processors</artifactId>
-    <groupId>${parent.groupId}</groupId>
-    <version>${parent.version}</version>
+    <name>processors</name>
+    <artifactId>deltaforce-annotations-processors</artifactId>
+    <version>1.0-SNAPSHOT</version>
 
 
     <build>
