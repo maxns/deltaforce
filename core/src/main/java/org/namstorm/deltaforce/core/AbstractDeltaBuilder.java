@@ -1,6 +1,5 @@
 package org.namstorm.deltaforce.core;
 
-import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -12,51 +11,135 @@ import java.util.Map;
  */
 public abstract class AbstractDeltaBuilder<T extends Object> {
 
-    private T result;
+    private T from;
 
-    private Map<String, Delta<?>> deltaMap = new HashMap<String, Delta<?>>();
+    private DeltaMap deltaMap;
 
-    public AbstractDeltaBuilder(T from) {
+    public AbstractDeltaBuilder() {
         super();
-        from(from);
-    }
 
-    protected void addDelta(Delta<?> delta) {
-        deltaMap.put(delta.getFieldName(), delta);
-    }
-
-    public AbstractDeltaBuilder<T> from(T from) {
-        this.result = from;
-        return this;
-    }
-
-    public void visitDeltas(DeltaVisitor visitor) {
-        for (Delta<?> delta : deltaMap.values()) {
-            visitor.visit(delta.getOp(), delta.getFieldName(), delta.getNewValue());
-        }
-    }
-
-    protected T result() {
-        return result;
-    }
-
-    protected Map<String, Delta<?>> deltaMap() {
-        return deltaMap;
-    }
-
-
-    public T build() {
-        return apply(result());
     }
 
     /**
-     * This will be generated
+     * initialises the from
      *
-     * @param to
-     * @return result
+     * @param from
      */
-    protected abstract T apply(T to);
+    protected AbstractDeltaBuilder(T from) {
+        super();
 
+        from(from);
+    }
+
+    /**
+     * All deltas from now on will be vs this object
+     *
+     * @param from
+     * @return
+     */
+    public AbstractDeltaBuilder<T> from(T from) {
+        this.from = from;
+        return this;
+    }
+
+    protected T _from() {
+        return from == null? (from=create()):from;
+    }
+
+    /**
+     * Adds a delta
+     * @param delta
+     */
+    protected void addDelta(Delta<?> delta) {
+        deltaMap.addDelta(delta.getFieldName(), delta);
+    }
+
+    /**
+     * adds a delta within a map
+     *
+     * @param mapFieldName
+     * @param curMap
+     * @param fieldDelta
+     */
+    protected void addMapDelta(String mapFieldName, Map curMap, Delta<?> fieldDelta) {
+        DeltaMap map = (DeltaMap) deltaMap().map().get(mapFieldName);
+
+        if(map==null) {
+            map = new DeltaMap(mapFieldName, curMap);
+            addDelta(map);
+        }
+        map.addDelta(fieldDelta.getFieldName(), fieldDelta);
+    }
+
+    /**
+     * applies delta to map
+     *
+     * @param from
+     * @param to
+     */
+    protected void applyToMap(DeltaMap from, Map to) {
+        DeltaUtil.applyMapDeltas(from, to);
+    }
+
+    /**
+     * Visit all deltas
+     * @see DeltaVisitor
+     * @param visitor
+     */
+    public void visitDeltas(DeltaVisitor visitor) {
+        DeltaUtil.visitDeltas(deltaMap(), visitor);
+    }
+
+    protected T result() {
+        return from;
+    }
+
+    /**
+     * by default this is just a getter with lazy construction
+     * @return
+     */
+    protected DeltaMap deltaMap() {
+        return deltaMap == null ? deltaMap = createDeltaMap() : deltaMap;
+    }
+
+    /**
+     * creates a DeltaMap, but since this is a root element, it has the fieldName set to current class name
+     * @return
+     */
+    protected DeltaMap createDeltaMap() {
+        return new DeltaMap(this.getClass().toString(),null);
+    }
+
+
+    /**
+     * Applies collected deltas to a new object (which gets created on the spot)
+     *
+     * @see .apply(T)
+     * @see .create()
+     *
+     * @return
+     */
+    public T build() {
+        return apply(create());
+    }
+
+    /**
+     * applies deltas to an object to
+     *
+     * @param to object to which to apply this
+     * @return from
+     */
+    public abstract T apply(T to);
+
+    /**
+     * creates a new object
+     *
+     * @see T .build()
+     * @see T .apply(T)
+     *
+     * @return
+     */
+    public abstract T create();
 
     /**
      * does comparison of objects

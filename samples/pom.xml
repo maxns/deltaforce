@@ -5,9 +5,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>org.namstorm.deltaforce.samples</name>
-    <groupId>org.namstorm.deltaforce</groupId>
-    <artifactId>samples</artifactId>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.namstorm.deltaforce</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <name>samples</name>
+    <artifactId>deltaforce-samples</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 

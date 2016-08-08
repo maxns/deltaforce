@@ -3,6 +3,7 @@ package org.namstorm.deltaforce.samples;
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -38,9 +39,6 @@ public class ComplexPerson {
         return intValues;
     }
 
-    public Map getMeta() {
-        return meta;
-    }
 
     int intValue;
     short shortValue;
@@ -65,7 +63,14 @@ public class ComplexPerson {
     }
 
     @DeltaField(ignore = true)
-    Map meta;
+    Map transientMap;
+
+    @DeltaField(mapItem = "metaValue")
+    HashMap<String,String> metaValues = new HashMap<>();
+
+    public String getMetaValue(String key) {
+        return metaValues.get(key);
+    }
 
 
 }

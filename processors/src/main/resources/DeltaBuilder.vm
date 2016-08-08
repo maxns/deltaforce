@@ -3,6 +3,7 @@ package ${model.packageName};
 
 import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
 import org.namstorm.deltaforce.core.Delta;
+import org.namstorm.deltaforce.core.DeltaMap;
 import javax.annotation.Generated;
 
 /**
@@ -18,59 +19,110 @@ import javax.annotation.Generated;
 @Generated(value="$generatorClassName")
 public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
-public $class_name($model.className from) {super(from);}
+    public $class_name($model.className from) {super(from);}
 
-protected $model.className result() { return ($model.className) super.result(); }
+    @Override
+    public $model.className create() { return new ${model.className}(); }
 
-public $class_name from($model.className ${model.className.toLowerCase()}) { return ($class_name) super.from(${model.className.toLowerCase()}); }
+    @Override
+    public $class_name from($model.className from) { super.from(from); return this; }
+
 
 #foreach($field in $fields)
 
-    #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+    // AccessorType : ${field.accessorType}
+    #if( ${field.accessorType} == "field" )
+        #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
     /**
-* Sets the value on the underlying and records a delta (if values are different)
-     *
-     * @return the property descriptor
-     */
-public $class_name set$fnInMethod(final $field.type newValue) {
-// first check if we already have a delta of this field
-    ${field.boxedType} curValue;
+    * Sets the value on the underlying and records a delta (if values are different)
+    *
+    * @return the property descriptor
+    */
+    public $class_name set$fnInMethod(final $field.type newValue) {
+        // first check if we already have a delta of this field
+        ${field.boxedType} curValue;
 
-if(deltaMap().containsKey("${field.name}")) {
-curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
-}else {
-    #if( ${field.primitive} )
-    curValue = ${field.boxedType}.valueOf( result().get}$fnInMethod() );
-    #else
-    curValue = result().get$fnInMethod();
-    #end
-
-}
-
-Delta.OP op = compare(curValue, newValue);
-
-if(op!=Delta.OP.NOOP) {
-addDelta(new Delta(op, "${field.name}", curValue, newValue));
+        if(deltaMap().containsKey("${field.name}")) {
+            curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
+        }else {
+        #if( ${field.primitive} )
+            curValue = ${field.boxedType}.valueOf( _from().get$fnInMethod() );
+        #else
+            curValue = _from().get$fnInMethod();
+        #end
         }
-return this;
+
+        Delta.OP op = compare(curValue, newValue);
+
+        if(op != Delta.OP.NOOP) addDelta(new Delta(op, "${field.name}", curValue, newValue));
+
+        return this;
     }
+    #elseif( ${field.accessorType}=="map" )
+        #if( ${field.mapItem.substring(0,1)}=="+" )
+            #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
+        #else
+            #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
+        #end
+
+    public $class_name set$fnInMethod(final ${field.key.type} key, final ${field.value.type} value) {
+
+        ${field.value.boxedType} curValue;
+
+        // get existing value
+        #if( ${field.primitive} )
+        curValue = ${field.boxedType}.valueOf( _from().get}$fnInMethod(key) );
+        #else
+        curValue = _from().get$fnInMethod(key);
+        #end
+
+        Delta.OP op = compare(curValue, value);
+
+        if(op!=Delta.OP.NOOP) addMapDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else null #end, new Delta(op, key, curValue, value));
+
+        return this;
+    }
+    #end
 #end
 
     /**
-* apply deltas
-* @Override
-* @param to ${model.className} to apply deltas to
-* @return ${model.className} to object with deltas applies
-*/
-public ${model.className} apply(${model.className} to) {
+    * apply deltas
+    * @Override
+    * @param to ${model.className} to apply deltas to
+    * @return ${model.className} to object with deltas applies
+    */
+    public ${model.className} apply(${model.className} to) {
 
-#foreach($field in $fields)
-    #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+        #foreach($field in $fields)
+            #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
 
-if(deltaMap().containsKey("${field.name}")) to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$fnInMethod( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
-#end
+            if(deltaMap().containsKey("${field.name}")){
+            #if( ${field.accessorType} == "field" )
+                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$fnInMethod( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
 
-return to;
+            #elseif (${field.accessorType} == "map")
+                #if( ${field.mapItem.substring(0,1)}=="+" )
+                    #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
+                #else
+                    #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
+                #end
+
+            DeltaMap map = (DeltaMap) deltaMap().get("${field.name}");
+
+                #if( ${field.accessible} )
+                    applyToMap(map, to.${field.name});
+                #else
+                for(${field.key.boxedType} key: map ) {
+                    to.set$fnInMethod(key, map.get(key));
+                }
+                #end
+
+
+            #end
+            }
+        #end
+
+        return to;
 
     }
 

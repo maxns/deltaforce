@@ -14,4 +14,15 @@ import java.lang.annotation.*;
 @Retention(RetentionPolicy.SOURCE)
 public @interface DeltaField {
     boolean ignore() default false;
+
+    /**
+     * Supply this for map fields - to provide a logical-sounding name for map accessors
+     * e.g.
+     *
+     * @return
+     * @DataField(mapItem="metaData") Map metaDataMap;
+     * <p>
+     * If not provided, the builder will call them set{FieldName>}Value
+     */
+    String mapItem() default "+Value";
 }

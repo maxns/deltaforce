@@ -5,9 +5,14 @@
 
     <modelVersion>4.0.0</modelVersion>
 
-    <name>org.namstorm.deltaforce.annotations.processors</name>
-    <groupId>org.namstorm.deltaforce</groupId>
-    <artifactId>annotations.processors</artifactId>
+    <parent>
+        <artifactId>parent</artifactId>
+        <groupId>org.namstorm.deltaforce</groupId>
+        <version>1.0-SNAPSHOT</version>
+    </parent>
+
+    <name>processors</name>
+    <artifactId>deltaforce-annotations-processors</artifactId>
     <version>1.0-SNAPSHOT</version>
 
 
@@ -27,6 +32,14 @@
     </build>
 
     <dependencies>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-lang3 -->
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>3.4</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>annotations</artifactId>
