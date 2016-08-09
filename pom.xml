@@ -16,6 +16,7 @@
         <module>processors</module>
         <module>samples</module>
         <module>core</module>
+        <module>ledgers</module>
     </modules>
 
     <build>
