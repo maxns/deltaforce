@@ -14,7 +14,7 @@
       <entry name="!?*.aj" />
     </wildcardResourcePatterns>
     <annotationProcessing>
-      <profile default="true" name="Default" enabled="false">
+      <profile default="true" name="Default" enabled="true">
         <processorPath useClasspath="true" />
       </profile>
       <profile default="false" name="Maven default annotation processors profile" enabled="true">
@@ -23,6 +23,8 @@
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="true" />
         <module name="annotations" />
+        <module name="deltaforce-ledgers" />
+        <module name="deltaforce-samples" />
         <module name="samples" />
       </profile>
     </annotationProcessing>
@@ -31,6 +33,9 @@
       <module name="annotations.processors" target="1.8" />
       <module name="core" target="1.8" />
       <module name="deltaforce" target="1.8" />
+      <module name="deltaforce-annotations-processors" target="1.8" />
+      <module name="deltaforce-ledgers" target="1.8" />
+      <module name="deltaforce-samples" target="1.8" />
       <module name="samples" target="1.8" />
     </bytecodeTargetLevel>
   </component>

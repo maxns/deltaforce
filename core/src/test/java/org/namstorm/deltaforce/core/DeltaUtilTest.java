@@ -32,7 +32,7 @@ public class DeltaUtilTest extends TestCase {
 
         testMap = new HashMap<>();
 
-        deltaMap = new DeltaMap(getName(), refSourceMap);
+        deltaMap = new DeltaMap(Delta.OP.UPDATE, getName(), refSourceMap);
     }
     Random rnd = new Random(System.currentTimeMillis());
 
@@ -95,7 +95,7 @@ public class DeltaUtilTest extends TestCase {
 
         DeltaMap deepDeltas;
 
-        deepDeltas = new DeltaMap(MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
+        deepDeltas = new DeltaMap(Delta.OP.UPDATE, MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
         deepDeltas.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.UPDATE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
 
         deltaMap.addDelta(MAGIC_MAP_KEY, deepDeltas);
@@ -103,7 +103,7 @@ public class DeltaUtilTest extends TestCase {
 
         assertEquals("Updated value", TEST_UPDATE_VALUE, ((Map)testMap.get(MAGIC_MAP_KEY)).get(MAGIC_KEY));
 
-        deepDeltas = new DeltaMap(MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
+        deepDeltas = new DeltaMap(Delta.OP.UPDATE,MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
         deepDeltas.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.REMOVE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
 
         deltaMap.addDelta(MAGIC_MAP_KEY, deepDeltas);

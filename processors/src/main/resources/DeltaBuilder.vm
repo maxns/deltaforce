@@ -21,11 +21,10 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     public $class_name($model.className from) {super(from);}
 
-    @Override
-    public $model.className create() { return new ${model.className}(); }
+    @Override public $model.className create() { return new ${model.className}(); }
 
-    @Override
-    public $class_name from($model.className from) { super.from(from); return this; }
+    @Override public $class_name from($model.className from) { super.from(from); return this; }
+    @Override public $class_name op(Delta.OP op) { super.op(op); return this; }
 
 
 #foreach($field in $fields)

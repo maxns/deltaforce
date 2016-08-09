@@ -41,17 +41,26 @@
         </dependency>
 
         <dependency>
-            <groupId>org.namstorm.deltaforce</groupId>
-            <artifactId>annotations</artifactId>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>deltaforce-annotations</artifactId>
             <version>1.0-SNAPSHOT</version>
             <scope>compile</scope>
         </dependency>
+
+        <dependency>
+            <groupId>${project.groupId}</groupId>
+            <artifactId>deltaforce-core</artifactId>
+            <version>1.0-SNAPSHOT</version>
+            <scope>compile</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity</artifactId>
             <version>1.6.4</version>
             <scope>compile</scope>
         </dependency>
+
         <dependency>
             <groupId>org.apache.velocity</groupId>
             <artifactId>velocity-tools</artifactId>

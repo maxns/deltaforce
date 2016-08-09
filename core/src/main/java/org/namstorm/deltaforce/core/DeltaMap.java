@@ -12,9 +12,9 @@ import java.util.Set;
  */
 public class DeltaMap<K extends String, V extends Delta> extends Delta<Map<K,V>> implements Map<K,V> {
 
-    public DeltaMap(K fieldName, Map oldValue) {
+    public DeltaMap(OP op, K fieldName, Map oldValue) {
 
-        super(OP.UPDATE, fieldName, oldValue, new HashMap<>());
+        super(op, fieldName, oldValue, new HashMap<>());
     }
     protected Map<K, V> map() { return getNewValue(); }
 

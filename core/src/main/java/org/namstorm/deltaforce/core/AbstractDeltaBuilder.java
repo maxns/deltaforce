@@ -9,7 +9,7 @@ import java.util.Map;
  *
  * @see @DeltaBuilder
  */
-public abstract class AbstractDeltaBuilder<T extends Object> {
+public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBuilder<T> {
 
     private T from;
 
@@ -65,7 +65,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
         DeltaMap map = (DeltaMap) deltaMap().map().get(mapFieldName);
 
         if(map==null) {
-            map = new DeltaMap(mapFieldName, curMap);
+            map = new DeltaMap(Delta.OP.UPDATE, mapFieldName, curMap);
             addDelta(map);
         }
         map.addDelta(fieldDelta.getFieldName(), fieldDelta);
@@ -81,18 +81,18 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
         DeltaUtil.applyMapDeltas(from, to);
     }
 
+
+
     /**
      * Visit all deltas
      * @see DeltaVisitor
      * @param visitor
      */
+    @Override
     public void visitDeltas(DeltaVisitor visitor) {
         DeltaUtil.visitDeltas(deltaMap(), visitor);
     }
 
-    protected T result() {
-        return from;
-    }
 
     /**
      * by default this is just a getter with lazy construction
@@ -107,7 +107,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
      * @return
      */
     protected DeltaMap createDeltaMap() {
-        return new DeltaMap(this.getClass().toString(),null);
+        return new DeltaMap(Delta.OP.UPDATE, this.getClass().toString(),null);
     }
 
 
@@ -119,33 +119,22 @@ public abstract class AbstractDeltaBuilder<T extends Object> {
      *
      * @return
      */
+    @Override
     public T build() {
         return apply(create());
     }
 
-    /**
-     * applies deltas to an object to
-     *
-     * @param to object to which to apply this
-     * @return from
-     */
-    public abstract T apply(T to);
-
-    /**
-     * creates a new object
-     *
-     * @see T .build()
-     * @see T .apply(T)
-     *
-     * @return
-     */
-    public abstract T create();
+    @Override
+    public DeltaBuilder op(Delta.OP op) {
+        deltaMap().op = op;
+        return this;
+    }
 
     /**
      * does comparison of objects
      *
-     * @param oldval
-     * @param newval
+     * @param oldval - old value
+     * @param newval - new value
      * @return Delta.OP value of
      * <p>
      * NOOP - if objects are the same (even if null)

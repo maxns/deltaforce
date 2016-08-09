@@ -32,7 +32,7 @@ package org.namstorm.deltaforce.ledgers;
  *              @DeltaBuilder
  *              Status status;
  *              @DeltaBuilder
- *              List<Events> events;
+ *              List<Event> events;
  *
  *          }
  *
@@ -45,11 +45,21 @@ package org.namstorm.deltaforce.ledgers;
  *          class OrderLedgerSchema...
  *      </code>
  *
- *      This, in turn, create a OrderLedger object with builder methods
+ *      This, in turn, generates a OrderLedger object with builder methods that correspond to an action and return builder for a particular object, ie:
+ *      ie:
+ *          createXXX - if you're creating a new object
+ *          editXXX - if you're updating something
+ *          deleteXXX - if you're deleting
+ *
+ *      in addition, it'll generate special special builders for Maps, Sets and Lists
+ *
+
  *      <code>
  *          @Generated
  *          class OrderLedger {
- *              order
+ *              OrderBuilder updateOrder();
+ *              StatusBuilder updateStatus();
+ *              ListBuilder<Event>< updateEvents();
  *          }
  *      </code>
  *

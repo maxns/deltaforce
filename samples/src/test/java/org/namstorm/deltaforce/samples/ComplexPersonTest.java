@@ -2,6 +2,7 @@ package org.namstorm.deltaforce.samples;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.namstorm.deltaforce.core.Delta;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
@@ -23,6 +24,7 @@ public class ComplexPersonTest extends TestCase {
     @Test
     public void testSetters() throws Exception {
         ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
+                .op(Delta.OP.ADD)
                 .setByteValue(VAL_BYTE)
                 .setDoubleValue(VAL_DOUBLE)
                 .setFloatValue(VAL_FLOAT)
@@ -32,6 +34,7 @@ public class ComplexPersonTest extends TestCase {
                 .setLongValue(VAL_LONG)
                 .setMetaValue(VAL_META_NAME,VAL_META_VALUE)
                 .build();
+
 
         assertEquals(VAL_BYTE, testPerson.getByteValue());
         assertEquals(VAL_DOUBLE, testPerson.getDoubleValue());

@@ -11,10 +11,10 @@ public class Delta<T> {
         NOOP
     }
 
-    private String fieldName;
-    private OP op;
-    private T newValue;
-    private T oldValue;
+    String fieldName;
+    OP op;
+    T newValue;
+    T oldValue;
 
     public T getOldValue() {
         return oldValue;
