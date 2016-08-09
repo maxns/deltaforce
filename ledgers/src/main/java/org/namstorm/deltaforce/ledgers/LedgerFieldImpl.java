@@ -11,7 +11,7 @@ public class LedgerFieldImpl<T> implements LedgerField<T> {
     private DeltaBuilder<T> builder;
     private Class fieldClass;
 
-    public LedgerFieldImpl(T value, String fieldName, DeltaBuilder<T> builder, Class fieldClass) {
+    public LedgerFieldImpl(Class fieldClass, String fieldName, T value, DeltaBuilder<T> builder) {
         this.value = value;
         this.fieldName = fieldName;
         this.builder = builder;

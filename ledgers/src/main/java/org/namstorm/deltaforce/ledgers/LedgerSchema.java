@@ -10,5 +10,5 @@ import java.util.Set;
  */
 public interface LedgerSchema<T extends LedgerField> {
 
-    public Set<T> fields();
+    Set<T> fields();
 }

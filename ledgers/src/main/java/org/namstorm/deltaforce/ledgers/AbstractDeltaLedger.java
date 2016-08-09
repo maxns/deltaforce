@@ -12,7 +12,7 @@ import java.util.List;
  * Knows how to talk to builders and get their deltas
  *
  */
-public abstract class AbstractDeltaLedger {
+public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
 
     enum Status {
         Open,
@@ -20,37 +20,37 @@ public abstract class AbstractDeltaLedger {
     }
 
     private Status status = Status.Closed;
-    private LedgerSchema<?> schema;
+    protected T schema;
 
-    public AbstractDeltaLedger(LedgerSchema schema) {
+    protected T schema() { return schema; }
+
+    public AbstractDeltaLedger() {
 
         super();
-        setSchema(schema);
-
-    }
-
-    protected void setSchema(LedgerSchema<?> schema) {
-        this.schema = initSchema(schema);
+        schema = initSchema();
     }
 
     /**
      * override to initialise schema
      *
-     * @param schema
      * @return
      */
-    protected abstract LedgerSchema initSchema(LedgerSchema schema);
+    protected abstract T initSchema();
 
 
     public void open() {
-
-        if(status == Status.Closed) {
-            throw new IllegalStateException("Ledger is already open");
-        }
+        _assertClosed();
 
         setStatus(Status.Open);
         startEdit();
     }
+
+    private void _assertClosed() {
+        if(status != Status.Closed) {
+            throw new IllegalStateException("Ledger is already open");
+        }
+    }
+
     public void commit() {
         _assertOpen("Cannot commit if not open");
 
@@ -81,12 +81,13 @@ public abstract class AbstractDeltaLedger {
     protected abstract void startEdit();
 
     /**
-     * Override to provide commit logic
+     *
      */
     protected void commitEdit() {
-        for(LedgerField f:schema.fields()) {
-            commitField(f);
-        }
+        schema.fields().forEach(f -> {
+
+            commitField((LedgerField<?>) f);
+        });
     }
 
     /**
@@ -95,11 +96,18 @@ public abstract class AbstractDeltaLedger {
      */
     private void commitField(LedgerField<?> f) {
         f.getBuilder().visitDeltas(delta -> {
-            commitDelta(f, delta);            
+            commitDelta(f, delta);
         });
     }
 
-    protected abstract void commitDelta(LedgerField<?> f, Delta<?> delta);
+    /**
+     * Override to provide handling of commit delta
+     * @param f
+     * @param delta
+     */
+    protected void commitDelta(LedgerField f, Delta delta) {
+        f.getBuilder().apply(f.getFieldValue());
+    }
 
     /**
      * Override to provide edit cancle logic
