@@ -2,6 +2,8 @@ package org.namstorm.deltaforce.annotations.processors;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
+import javax.lang.model.element.VariableElement;
+
 /**
  * Created by maxnamstorm on 4/8/2016.
  */

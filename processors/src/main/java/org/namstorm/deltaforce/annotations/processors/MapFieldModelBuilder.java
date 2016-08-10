@@ -1,24 +1,27 @@
 package org.namstorm.deltaforce.annotations.processors;
-
 import org.namstorm.deltaforce.annotations.DeltaField;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.util.List;
+import java.util.*;
 
 import static javax.tools.Diagnostic.*;
 
 /**
  * Created by maxnam-storm on 10/8/2016.
  */
-public class MapFieldModelBuilder extends FieldModelBuilder {
+public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Map> {
+
+    public static final Set<Class<? extends Map>> FIELD_BASE_CLASSES = Collections.unmodifiableSet(
+            new HashSet<>(Arrays.asList(Map.class, HashMap.class)));
+
     public MapFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
     }
 
     @Override
-    public FieldModel build() {
+    public MapFieldModel build() {
 
         MapFieldModel mapRes = new MapFieldModel();
         applyCommon(mapRes);
@@ -52,5 +55,7 @@ public class MapFieldModelBuilder extends FieldModelBuilder {
 
         return mapRes;
     }
+
+
 
 }

@@ -183,13 +183,24 @@ public class DeltaBuilderProcessor
                     }
                 }
 
-                FieldModelImpl field = createFieldModel(fe, fea);
+                FieldModelImpl field = null;
+                try {
+                    field = createFieldModel(fe, fea);
 
-                fields.put(field.name, field);
+                    fields.put(field.name, field);
 
-                processingEnv.getMessager().printMessage(
-                        Diagnostic.Kind.NOTE,
-                        "annotated field: " + field.name + " // field type: " + field.type, elem);
+                    processingEnv.getMessager().printMessage(
+                            Diagnostic.Kind.NOTE,
+                            "annotated field: " + field.name + " // field type: " + field.type, elem);
+
+                } catch (InstantiationException e) {
+                    printError("Failed to create field:" + e, fe);
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    printError("Failed to create field:" + e, fe);
+                    e.printStackTrace();
+                }
+
 
 
             }
@@ -206,50 +217,9 @@ public class DeltaBuilderProcessor
      */
     static final String MAP_CLASS = HashMap.class.getCanonicalName();
 
-    private FieldModelImpl createFieldModel(VariableElement ve, DeltaField dfa) {
-        FieldModelImpl res;
+    private FieldModelImpl createFieldModel(VariableElement ve, DeltaField dfa) throws InstantiationException, IllegalAccessException {
 
-
-        if (StringUtils.startsWith(ve.asType().toString(), MAP_CLASS)) {
-
-            MapFieldModel mapRes = new MapFieldModel();
-
-            DeclaredType ty = (DeclaredType) ve.asType();
-
-            mapRes.mapItem = dfa.mapItem();
-
-            mapRes.key = new FieldModelImpl();
-
-            mapRes.key.type = "Object";
-            mapRes.value = new FieldModelImpl();
-            mapRes.value.type = "Object";
-            mapRes.type = ve.asType().toString();
-            mapRes.boxedType = mapRes.type;
-
-            // if we got T params
-            List<? extends TypeMirror> Targs = ty.getTypeArguments();
-            if (Targs.size() == 2) {
-                mapRes.key = box(mapRes.key, Targs.get(0));
-                mapRes.value = box(mapRes.value, Targs.get(1));
-            } else {
-                printWarn("Got an irregular number of type args in Map defi, ignoring", ve);
-            }
-
-            res = mapRes;
-
-
-        } else {
-            res = new FieldModelImpl();
-            res = box(res, ve.asType());
-        }
-
-        res.accessible = !ve.getModifiers().contains(Modifier.PRIVATE);
-
-        res.name = ve.getSimpleName().toString();
-
-        printNote("created field model:" + res.toString(), ve);
-
-        return res;
+        return FieldModelBuilderFactory.getInstance().create(processingEnv, ve).build();
     }
 
 

@@ -1,45 +1,42 @@
 package org.namstorm.deltaforce.annotations.processors;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeMirror;
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Array;
-import java.util.function.Consumer;
+import java.util.Set;
 
-import static javax.tools.Diagnostic.*;
+import static javax.tools.Diagnostic.Kind;
 
 /**
  * Created by maxnam-storm on 10/8/2016.
  * <p>
  * Builds field models
  */
-public abstract class AbstractFieldModelBuilder<T extends FieldModel> {
+public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement, M> {
 
-    protected VariableElement element;
-    protected ProcessingEnvironment pe;
-
-    public AbstractFieldModelBuilder() {
+    public VariableModelBuilder() {
         super();
     }
 
-    public AbstractFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
-        super();
-        this.pe = processingEnvironment;
-    }
-
-
-    public AbstractFieldModelBuilder with(VariableElement ve) {
-        element = ve;
-
-        return this;
-    }
+    public VariableModelBuilder(ProcessingEnvironment processingEnvironment) {
+        super(processingEnvironment);
+        }
 
     /**
      * Actually builds it
      * @return
      */
-    public abstract T build();
+    public abstract M build();
+
+    /**
+     * boex it up
+     * @param field
+     * @param typeMirror
+     * @param <A>
+     * @return
+     */
 
     protected <A extends FieldModelImpl> A box(A field, TypeMirror typeMirror) {
 
@@ -62,25 +59,26 @@ public abstract class AbstractFieldModelBuilder<T extends FieldModel> {
 
     }
 
+    /**
+     * uses processEnvironment to print a {msg} of {kind}
+     *
+     * @param kind
+     * @param msg
+     */
     protected void printMessage(Kind kind, String msg) {
         pe.getMessager().printMessage(kind, msg, element);
     }
 
 
-    protected <A extends Annotation> A whenAnnotated(Class<A> annotClass, Consumer<A> consumer) {
+    /**
+     * Autoboxes from the typemirror
+     *
+     * @param type
+     * @return
+     */
+    protected Class autobox(TypeMirror type) {
 
-        A a = element.getAnnotation(annotClass);
-
-        if(a!=null) {
-            consumer.accept(a);
-        }
-
-        return a;
-    }
-
-    protected Class autobox(TypeMirror mirror) {
-
-        switch (mirror.getKind()) {
+        switch (type.getKind()) {
             case INT:
                 return Integer.class;
             case ARRAY:
@@ -103,11 +101,27 @@ public abstract class AbstractFieldModelBuilder<T extends FieldModel> {
                 return Error.class;
             default:
                 try {
-                    return Class.forName(mirror.toString());
+                    return Class.forName(type.toString());
                 } catch (ClassNotFoundException e) {
-                    printMessage(Kind.ERROR, "Failed to autobox from " + mirror + ", e:" + e.toString());
+                    printMessage(Kind.ERROR, "Failed to autobox from " + type + ", e:" + e.toString());
                     return Object.class;
                 }
         }
+    }
+
+    /**
+     * Applies common fields
+     *
+     * @param fieldModel mutable FieldModel
+     * @return fieldModel
+     */
+    public <A extends FieldModelImpl> A applyCommon(final A fieldModel) {
+        fieldModel.accessible = !element.getModifiers().contains(Modifier.PRIVATE);
+
+        fieldModel.name = element.getSimpleName().toString();
+
+        printMessage(Kind.NOTE, "created field model:" + fieldModel.toString());
+
+        return fieldModel;
     }
 }
