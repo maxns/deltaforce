@@ -15,12 +15,14 @@ import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
 import java.lang.reflect.Array;
+import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
@@ -33,7 +35,9 @@ import java.util.*;
 public class DeltaBuilderProcessor
         extends AbstractProcessor {
 
-    /** keeping it plain, avoiding Android issues */
+    /**
+     * keeping it plain, avoiding Android issues
+     */
     static HashSet<String> SUPPORTED_TYPES = new HashSet<>(Arrays.asList("org.namstorm.deltaforce.annotations.DeltaBuilder"));
     private Properties properties;
     private VelocityEngine velocityEngine;
@@ -68,7 +72,7 @@ public class DeltaBuilderProcessor
             velocityEngine = new VelocityEngine(properties);
             velocityEngine.init();
 
-        }catch (Exception e) {
+        } catch (Exception e) {
             printError("Failed to initialise velocity engine:" + e.toString(), null);
         }
     }
@@ -114,35 +118,9 @@ public class DeltaBuilderProcessor
 
                     processingEnv.getMessager().printMessage(
                             Diagnostic.Kind.NOTE,
-                            "annotated class: " + model.qualifiedName, elem);
+                            "annotating class: " + model.qualifiedName, elem);
 
-
-                    for (Element ec : elem.getEnclosedElements()) {
-                        if (ec.getKind() == ElementKind.FIELD) {
-
-                            VariableElement fe = (VariableElement) ec;
-                            ce = fe;
-
-                            DeltaField fea = fe.getAnnotation(DeltaField.class);
-
-                            if (fea != null) {
-                                if (fea.ignore()) {
-                                    printNote("ignoring annotated field: " + fe.toString(), elem);
-                                    continue;
-                                }
-                            }
-
-                            FieldModel field = createFieldModel(fe, fea);
-
-                            fields.put(field.name, field);
-
-                            processingEnv.getMessager().printMessage(
-                                    Diagnostic.Kind.NOTE,
-                                    "annotated field: " + field.name + " // field type: " + field.type, elem);
-
-
-                        }
-                    }
+                    collectFields(classElement, fields, !annotation.ignoreInherited());
 
 
                 }
@@ -177,6 +155,51 @@ public class DeltaBuilderProcessor
         return true;
     }
 
+    private void collectFields(TypeElement elem, Map<String, FieldModel> fields, boolean recurse) {
+        TypeMirror type = elem.asType();
+
+        if (recurse) {
+            if ((elem.getKind() == ElementKind.CLASS)) {
+                if (type.getKind() == TypeKind.DECLARED) {
+                    if (elem.getSuperclass() != null && elem.getSuperclass().getKind() == TypeKind.DECLARED) {
+                        DeclaredType superType = (DeclaredType) elem.getSuperclass();
+                        TypeElement superElem = (TypeElement) superType.asElement();
+                        if (superElem != null) {
+                            collectFields(superElem, fields, recurse);
+                        }
+                    }
+                }
+            }
+        }
+
+        for (Element ec : elem.getEnclosedElements()) {
+            if (ec.getKind() == ElementKind.FIELD) {
+
+                VariableElement fe = (VariableElement) ec;
+
+                DeltaField fea = fe.getAnnotation(DeltaField.class);
+
+                if (fea != null) {
+                    if (fea.ignore()) {
+                        printNote("ignoring annotated field: " + fe.toString(), elem);
+                        continue;
+                    }
+                }
+
+                FieldModel field = createFieldModel(fe, fea);
+
+                fields.put(field.name, field);
+
+                processingEnv.getMessager().printMessage(
+                        Diagnostic.Kind.NOTE,
+                        "annotated field: " + field.name + " // field type: " + field.type, elem);
+
+
+            }
+        }
+
+    }
+
     /**
      * Figure out which model to use
      *
@@ -190,7 +213,7 @@ public class DeltaBuilderProcessor
         FieldModel res;
 
 
-        if ( StringUtils.startsWith(ve.asType().toString(), MAP_CLASS) ) {
+        if (StringUtils.startsWith(ve.asType().toString(), MAP_CLASS)) {
 
             MapFieldModel mapRes = new MapFieldModel();
 
@@ -248,6 +271,7 @@ public class DeltaBuilderProcessor
         vc.put("generatorClassName", this.getClass().toString());
         vc.put("model", model);
         vc.put("fields", fields);
+        vc.put("date", new Date().toString());
 
         // adding DisplayTool from Velocity Tools library
         vc.put("display", new DisplayTool());

@@ -2,15 +2,15 @@ package org.namstorm.deltaforce.ledgers;
 
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.core.Delta;
+import org.namstorm.deltaforce.core.RecursiveDeltaMapVisitor;
 
 import java.util.List;
 
 /**
  * Created by maxnam-storm on 9/8/2016.
- *
+ * <p>
  * Manages ledger state
  * Knows how to talk to builders and get their deltas
- *
  */
 public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
 
@@ -22,7 +22,9 @@ public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
     private Status status = Status.Closed;
     protected T schema;
 
-    protected T schema() { return schema; }
+    protected T schema() {
+        return schema;
+    }
 
     public AbstractDeltaLedger() {
 
@@ -46,7 +48,7 @@ public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
     }
 
     private void _assertClosed() {
-        if(status != Status.Closed) {
+        if (status != Status.Closed) {
             throw new IllegalStateException("Ledger is already open");
         }
     }
@@ -80,34 +82,51 @@ public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
      */
     protected abstract void startEdit();
 
+
     /**
-     *
+     * Cycles through the fields and calls commitField
      */
     protected void commitEdit() {
         schema.fields().forEach(f -> {
 
-            commitField((LedgerField<?>) f);
+            commitField((LedgerField) f);
         });
+
     }
 
+    private abstract class CommitVisitor extends RecursiveDeltaMapVisitor {
+
+        @Override
+        public void visit(Delta<?> delta) {
+            onDelta(delta);
+            super.visit(delta);
+        }
+        abstract void onDelta(Delta<?> delta);
+
+    }
     /**
-     * Commits individual field by collecting all deltas
+     * Commits individual field by collecting all deltas within it using recursive delta visitor
+     *
      * @param f
      */
-    private void commitField(LedgerField<?> f) {
-        f.getBuilder().visitDeltas(delta -> {
-            commitDelta(f, delta);
+    private void commitField(final LedgerField f) {
+        f.getBuilder().apply(f.getFieldValue());
+
+        f.getBuilder().visitDeltas(new CommitVisitor() {
+            @Override
+            void onDelta(Delta<?> delta) {
+                AbstractDeltaLedger.this.onDelta(f, delta);
+            }
         });
     }
 
     /**
      * Override to provide handling of commit delta
+     *
      * @param f
      * @param delta
      */
-    protected void commitDelta(LedgerField f, Delta delta) {
-        f.getBuilder().apply(f.getFieldValue());
-    }
+    protected abstract void onDelta(LedgerField f, Delta delta);
 
     /**
      * Override to provide edit cancle logic

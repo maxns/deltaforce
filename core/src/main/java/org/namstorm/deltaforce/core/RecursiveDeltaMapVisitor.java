@@ -13,11 +13,13 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
     }
 
     protected RecursiveDeltaMapVisitor() {
-
+        this.fieldVisitor = f -> {};
     }
 
     @Override
     public void visit(Delta<?> delta) {
+
+
         if(delta instanceof DeltaMap) {
             visitMap((DeltaMap)delta);
         }else {
@@ -29,7 +31,7 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
         fieldVisitor.visit(delta);
     }
 
-    protected void visitMap(DeltaMap deltaMap) {
-        DeltaUtil.visitDeltas(deltaMap, this);
+    protected void visitMap(DeltaMap<String, Delta> deltaMap) {
+        deltaMap.values().forEach(d -> visit(d));
     }
 }

@@ -19,7 +19,7 @@ public class SampleLedger extends SerializingDeltaLedger<SampleLedger.Schema> {
     }
 
     public ComplexPerson buyer() { return schema().buyer; }
-    public ComplexPerson salesPerson() { return schema().buyer; }
+    public ComplexPerson salesPerson() { return schema().salesPerson; }
 
     public ComplexPersonBuilder editBuyer() {
         _assertOpen("Can't edit until ledger is open");

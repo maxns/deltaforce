@@ -2,6 +2,7 @@ package org.namstorm.deltaforce.samples.ledgers;
 
 import org.apache.commons.lang.SerializationUtils;
 import org.namstorm.deltaforce.core.Delta;
+import org.namstorm.deltaforce.core.DeltaMap;
 import org.namstorm.deltaforce.ledgers.AbstractDeltaLedger;
 import org.namstorm.deltaforce.ledgers.LedgerField;
 import org.namstorm.deltaforce.ledgers.LedgerSchema;
@@ -31,10 +32,12 @@ public abstract class SerializingDeltaLedger<T extends LedgerSchema> extends Abs
     }
 
     @Override
-    protected void commitDelta(LedgerField f, Delta delta) {
-        super.commitDelta(f, delta);
-        buffer.append(f.getFieldName())
-                .append(delta);
+    protected void onDelta(LedgerField f, Delta delta) {
+        buffer.append(delta.getOp())
+                .append(":").append(f.getFieldName()).append(":")
+                .append(delta.getFieldName()).append(".").append(delta.getOp())
+                .append("(").append(delta.getNewValue()).append(")");
+
     }
 
     @Override
@@ -42,9 +45,18 @@ public abstract class SerializingDeltaLedger<T extends LedgerSchema> extends Abs
         super.commitEdit();
         try {
             writer.write(buffer.toString());
+            writer.flush();
+
         } catch (IOException e) {
             e.printStackTrace();
             cancelEdit();
+        } finally {
+            try {
+                writer.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+
     }
 }

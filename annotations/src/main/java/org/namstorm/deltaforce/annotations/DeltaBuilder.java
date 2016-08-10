@@ -18,7 +18,16 @@ import java.lang.annotation.*;
 public @interface DeltaBuilder {
 
 
+    /**
+     * Default 'Builder' - but can be set to anything as suffix of the builder name
+     * @return
+     */
     String builderNameSuffix() default "Builder";
 
+    /**
+     * If set to true, will NOT go into superclass and get fields from it
+     * @return
+     */
+    boolean ignoreInherited() default false;
 
 }
