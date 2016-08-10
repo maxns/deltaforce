@@ -1,6 +1,5 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.apache.commons.collections.SetUtils;
 import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
@@ -21,8 +20,6 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
-import java.lang.reflect.Array;
-import java.lang.reflect.Type;
 import java.net.URL;
 import java.util.*;
 
@@ -186,7 +183,7 @@ public class DeltaBuilderProcessor
                     }
                 }
 
-                FieldModel field = createFieldModel(fe, fea);
+                FieldModelImpl field = createFieldModel(fe, fea);
 
                 fields.put(field.name, field);
 
@@ -209,8 +206,8 @@ public class DeltaBuilderProcessor
      */
     static final String MAP_CLASS = HashMap.class.getCanonicalName();
 
-    private FieldModel createFieldModel(VariableElement ve, DeltaField dfa) {
-        FieldModel res;
+    private FieldModelImpl createFieldModel(VariableElement ve, DeltaField dfa) {
+        FieldModelImpl res;
 
 
         if (StringUtils.startsWith(ve.asType().toString(), MAP_CLASS)) {
@@ -221,10 +218,10 @@ public class DeltaBuilderProcessor
 
             mapRes.mapItem = dfa.mapItem();
 
-            mapRes.key = new FieldModel();
+            mapRes.key = new FieldModelImpl();
 
             mapRes.key.type = "Object";
-            mapRes.value = new FieldModel();
+            mapRes.value = new FieldModelImpl();
             mapRes.value.type = "Object";
             mapRes.type = ve.asType().toString();
             mapRes.boxedType = mapRes.type;
@@ -242,7 +239,7 @@ public class DeltaBuilderProcessor
 
 
         } else {
-            res = new FieldModel();
+            res = new FieldModelImpl();
             res = box(res, ve.asType());
         }
 
@@ -309,57 +306,5 @@ public class DeltaBuilderProcessor
     }
 
 
-    private FieldModel box(FieldModel field, TypeMirror typeMirror) {
 
-        field.type = typeMirror.toString();
-
-        if (typeMirror.getKind().isPrimitive()) {
-            field.primitive = true;
-
-            printNote("boxing:" + typeMirror.getKind().name(), null);
-
-            field.boxedType = autobox(typeMirror).getName();
-
-        } else {
-            field.boxedType = field.type;
-
-            field.primitive = true;
-
-        }
-        return field;
-
-    }
-
-    public Class autobox(TypeMirror mirror) {
-
-        switch (mirror.getKind()) {
-            case INT:
-                return Integer.class;
-            case ARRAY:
-                return Array.class;
-            case BOOLEAN:
-                return Boolean.class;
-            case DOUBLE:
-                return Double.class;
-            case BYTE:
-                return Byte.class;
-            case CHAR:
-                return Character.class;
-            case FLOAT:
-                return Float.class;
-            case LONG:
-                return Long.class;
-            case SHORT:
-                return Short.class;
-            case ERROR:
-                return Error.class;
-            default:
-                try {
-                    return Class.forName(mirror.toString());
-                } catch (ClassNotFoundException e) {
-                    printWarn("Failed to autobox from " + mirror, null);
-                    return Object.class;
-                }
-        }
-    }
 }

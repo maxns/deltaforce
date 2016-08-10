@@ -13,7 +13,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
 
     private T from;
 
-    private DeltaMap deltaMap;
+    private DeltaMap<String,Delta<?>> deltaMap;
 
     public AbstractDeltaBuilder() {
         super();
@@ -62,10 +62,10 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      * @param fieldDelta
      */
     protected void addMapDelta(String mapFieldName, Map curMap, Delta<?> fieldDelta) {
-        DeltaMap map = (DeltaMap) deltaMap().map().get(mapFieldName);
+        DeltaMap<String,Delta<?>> map = (DeltaMap<String, Delta<?>>) deltaMap().map().get(mapFieldName);
 
         if(map==null) {
-            map = new DeltaMap(Delta.OP.UPDATE, mapFieldName, curMap);
+            map = new DeltaMap<>(Delta.OP.UPDATE, mapFieldName, curMap);
             addDelta(map);
         }
         map.addDelta(fieldDelta.getFieldName(), fieldDelta);
@@ -98,7 +98,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      * by default this is just a getter with lazy construction
      * @return
      */
-    protected DeltaMap deltaMap() {
+    protected DeltaMap<String, Delta<?>> deltaMap() {
         return deltaMap == null ? deltaMap = createDeltaMap() : deltaMap;
     }
 
@@ -106,8 +106,8 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      * creates a DeltaMap, but since this is a root element, it has the fieldName set to current class name
      * @return
      */
-    protected DeltaMap createDeltaMap() {
-        return new DeltaMap(Delta.OP.UPDATE, this.getClass().toString(),null);
+    protected DeltaMap<String, Delta<?>> createDeltaMap() {
+        return new DeltaMap<>(Delta.OP.UPDATE, this.getClass().toString(),null);
     }
 
 

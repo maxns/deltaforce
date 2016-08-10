@@ -22,7 +22,7 @@ public @interface DeltaField {
      * @return
      * @DataField(mapItem="metaData") Map metaDataMap;
      * <p>
-     * If not provided, the builder will call them set{FieldName>}Value
+     * If not provided, the builders will call them set{FieldName>}Value
      */
     String mapItem() default "+Value";
 }

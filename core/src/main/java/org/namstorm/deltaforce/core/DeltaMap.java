@@ -10,7 +10,7 @@ import java.util.Set;
  *
  * It's a delta containing a map of deltas
  */
-public class DeltaMap<K extends String, V extends Delta> extends Delta<Map<K,V>> implements Map<K,V> {
+public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,V>> implements Map<K,V> {
 
     public DeltaMap(OP op, K fieldName, Map oldValue) {
 
@@ -78,8 +78,8 @@ public class DeltaMap<K extends String, V extends Delta> extends Delta<Map<K,V>>
         return map().values();
     }
 
-    public Collection<Delta> deltas() {
-        return (Collection<Delta>) map().values();
+    public Collection<V> deltas() {
+        return map().values();
     }
 
     @Override

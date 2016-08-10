@@ -19,7 +19,7 @@ public @interface DeltaBuilder {
 
 
     /**
-     * Default 'Builder' - but can be set to anything as suffix of the builder name
+     * Default 'Builder' - but can be set to anything as suffix of the builders name
      * @return
      */
     String builderNameSuffix() default "Builder";

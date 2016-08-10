@@ -7,7 +7,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * This one will
  */
-public class MapFieldModel extends FieldModel {
+public class MapFieldModel extends FieldModelImpl {
     public static final String TYPE_MAP = "map";
     @Override
     public String getAccessorType() {
@@ -28,8 +28,8 @@ public class MapFieldModel extends FieldModel {
 
     String mapItem;
 
-    FieldModel key;
-    FieldModel value;
+    FieldModelImpl key;
+    FieldModelImpl value;
 
     @Override
     public String toString() {

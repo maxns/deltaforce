@@ -45,7 +45,7 @@ package org.namstorm.deltaforce.ledgers;
  *          class OrderLedgerSchema...
  *      </code>
  *
- *      This, in turn, generates a OrderLedger object with builder methods that correspond to an action and return builder for a particular object, ie:
+ *      This, in turn, generates a OrderLedger object with builders methods that correspond to an action and return builders for a particular object, ie:
  *      ie:
  *          createXXX - if you're creating a new object
  *          editXXX - if you're updating something

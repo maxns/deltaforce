@@ -31,7 +31,7 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
         fieldVisitor.visit(delta);
     }
 
-    protected void visitMap(DeltaMap<String, Delta> deltaMap) {
+    protected void visitMap(DeltaMap<String, Delta<?>> deltaMap) {
         deltaMap.values().forEach(d -> visit(d));
     }
 }
