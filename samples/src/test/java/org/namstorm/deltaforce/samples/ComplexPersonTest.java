@@ -29,7 +29,7 @@ public class ComplexPersonTest extends TestCase {
                 .setDoubleValue(VAL_DOUBLE)
                 .setFloatValue(VAL_FLOAT)
                 .setIntValue(VAL_INT)
-                .setIntValues(VAL_INT_ARR)
+
                 .setShortValue(VAL_SHORT)
                 .setLongValue(VAL_LONG)
                 .setMetaValue(VAL_META_NAME,VAL_META_VALUE)
@@ -41,7 +41,7 @@ public class ComplexPersonTest extends TestCase {
         assertEquals(VAL_FLOAT, testPerson.getFloatValue());
         assertEquals(VAL_INT, testPerson.getIntValue());
         assertEquals(VAL_SHORT, testPerson.getShortValue());
-        assertEquals(VAL_INT_ARR, testPerson.getIntValues());
+
         assertEquals(VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
 
         //now lets see if meta values survive

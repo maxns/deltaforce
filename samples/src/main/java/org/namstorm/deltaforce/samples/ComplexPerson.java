@@ -35,9 +35,6 @@ public class ComplexPerson extends Person{
         return doubleValue;
     }
 
-    public int[] getValues() {
-        return intValues;
-    }
 
 
     int intValue;
@@ -46,21 +43,10 @@ public class ComplexPerson extends Person{
     byte byteValue;
     float floatValue;
     double doubleValue;
-    int[] intValues;
-    private int[] privateIntValues;
+    //int[] intValues;
+    //private int[] privateIntValues;
 
-    public void setPrivateIntValues(int[] privateIntValues) {
-        this.privateIntValues = privateIntValues;
-    }
 
-    public int[] getIntValues() {
-
-        return intValues;
-    }
-
-    public int[] getPrivateIntValues() {
-        return privateIntValues;
-    }
 
     @DeltaField(ignore = true)
     Map transientMap;

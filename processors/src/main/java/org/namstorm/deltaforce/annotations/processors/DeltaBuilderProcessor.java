@@ -20,6 +20,7 @@ import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
 import java.io.IOException;
 import java.io.Writer;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URL;
 import java.util.*;
 
@@ -183,20 +184,17 @@ public class DeltaBuilderProcessor
                     }
                 }
 
-                FieldModelImpl field = null;
+                FieldModel field = null;
                 try {
                     field = createFieldModel(fe, fea);
 
-                    fields.put(field.name, field);
+                    fields.put(field.getName(), field);
 
                     processingEnv.getMessager().printMessage(
                             Diagnostic.Kind.NOTE,
-                            "annotated field: " + field.name + " // field type: " + field.type, elem);
+                            "annotated field: " + field.getName() + " // field type: " + field.getType(), elem);
 
-                } catch (InstantiationException e) {
-                    printError("Failed to create field:" + e, fe);
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
+                } catch (Exception e) {
                     printError("Failed to create field:" + e, fe);
                     e.printStackTrace();
                 }
@@ -217,7 +215,7 @@ public class DeltaBuilderProcessor
      */
     static final String MAP_CLASS = HashMap.class.getCanonicalName();
 
-    private FieldModelImpl createFieldModel(VariableElement ve, DeltaField dfa) throws InstantiationException, IllegalAccessException {
+    private FieldModel createFieldModel(VariableElement ve, DeltaField dfa) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 
         return FieldModelBuilderFactory.getInstance().create(processingEnv, ve).build();
     }

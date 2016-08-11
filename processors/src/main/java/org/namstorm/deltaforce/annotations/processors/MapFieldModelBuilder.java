@@ -13,8 +13,7 @@ import static javax.tools.Diagnostic.*;
  */
 public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Map> {
 
-    public static final Set<Class<? extends Map>> FIELD_BASE_CLASSES = Collections.unmodifiableSet(
-            new HashSet<>(Arrays.asList(Map.class, HashMap.class)));
+    public static final Class[] FIELD_BASE_CLASSES={Map.class, HashMap.class};
 
     public MapFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);

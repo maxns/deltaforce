@@ -22,14 +22,14 @@ public abstract class ModelBuilder<E extends Element, T extends ElementModel<E>>
 
     /**
      * assigns element <b>with</b> which to build
-     * @param builder
+     * @param element
      * @param element
      * @param <B>
      * @return
      */
-    public <B extends VariableModelBuilder> B with(B builder, E element) {
-        builder.element = element;
-        return builder;
+    public <B extends ModelBuilder> B with(E element) {
+        this.element = element;
+        return (B) this;
     }
 
     /**

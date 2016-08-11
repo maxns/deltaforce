@@ -30,6 +30,7 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
      */
     public abstract M build();
 
+
     /**
      * boex it up
      * @param field
@@ -76,7 +77,7 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
      * @param type
      * @return
      */
-    protected Class autobox(TypeMirror type) {
+    public static Class autobox(TypeMirror type) {
 
         switch (type.getKind()) {
             case INT:
@@ -103,8 +104,8 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
                 try {
                     return Class.forName(type.toString());
                 } catch (ClassNotFoundException e) {
-                    printMessage(Kind.ERROR, "Failed to autobox from " + type + ", e:" + e.toString());
-                    return Object.class;
+                    throw new IllegalArgumentException("Failed to autobox:" + type, e);
+
                 }
         }
     }

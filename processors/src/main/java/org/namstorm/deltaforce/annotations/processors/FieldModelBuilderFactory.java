@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+import org.apache.commons.lang3.reflect.TypeUtils;
 import org.apache.commons.validator.Var;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -7,7 +8,13 @@ import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.tools.Diagnostic;
+import java.lang.reflect.Array;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Type;
 import java.util.*;
 
 /**
@@ -22,9 +29,9 @@ public class FieldModelBuilderFactory {
     /**
      * Temporary hack, until we make this configurable
      */
-    private static Set[] BUILDER_BASECLASSES = {
-            MapFieldModelBuilder.FIELD_BASE_CLASSES,
-            FieldModelBuilder.FIELD_BASE_CLASSES
+    private static Object[][] BUILDERS = {
+            {MapFieldModelBuilder.FIELD_BASE_CLASSES, MapFieldModelBuilder.class},
+            {FieldModelBuilder.FIELD_BASE_CLASSES, FieldModelBuilder.class}
     };
 
     public FieldModelBuilderFactory() {
@@ -32,18 +39,21 @@ public class FieldModelBuilderFactory {
         initBuilderMap();
     }
 
-    private List<Class> fieldBaseClasses;
     private Map<String, Class<? extends VariableModelBuilder>> builderMap;
 
     private void initBuilderMap() {
-        fieldBaseClasses = new ArrayList<>();
         builderMap = new HashMap<>();
 
-        for(Set<Class> cs:BUILDER_BASECLASSES) {
-            cs.forEach(fieldBaseClass -> {
-                builderMap.put(fieldBaseClass.getName(), fieldBaseClass.getDeclaringClass());
-            });
+        for(int i=0; i<BUILDERS.length; i++) {
+            Class<FieldModelBuilder> builderClass = (Class<FieldModelBuilder>) BUILDERS[i][1];
+
+            Class[] builderFieldClasses = (Class[]) BUILDERS[i][0];
+
+            for(Class cs:builderFieldClasses) {
+                builderMap.put(cs.getName(), builderClass);
+            }
         }
+
     }
 
     /**
@@ -52,15 +62,33 @@ public class FieldModelBuilderFactory {
      * @param e
      * @return
      */
-    public VariableModelBuilder create(ProcessingEnvironment pe, VariableElement e) throws IllegalAccessException, InstantiationException {
+    public VariableModelBuilder create(ProcessingEnvironment pe, VariableElement e)  {
 
-        Class<? extends VariableModelBuilder> res = matchBuilder((TypeElement) e.getEnclosingElement());
+        Class<? extends VariableModelBuilder> res = matchBuilder(pe, e);
 
         if(res==null) {
             throw new IllegalArgumentException("Could not match:" + e + " with any builders");
         }
 
-        return res.newInstance();
+
+
+        try {
+            return (VariableModelBuilder) res.getConstructor(ProcessingEnvironment.class).newInstance(pe).with(e);
+
+        } catch (InstantiationException e1) {
+            log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
+            e1.printStackTrace();
+        } catch (IllegalAccessException e1) {
+            log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
+            e1.printStackTrace();
+        } catch (InvocationTargetException e1) {
+            log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
+            e1.printStackTrace();
+        } catch (NoSuchMethodException e1) {
+            log(pe, Diagnostic.Kind.ERROR, "Failed to find constructor with (ProcessingEnvironment as arg):" + res + ", due to:" + e1, e);
+            e1.printStackTrace();
+        }
+        return null;
     }
 
 
@@ -94,25 +122,83 @@ public class FieldModelBuilderFactory {
      *  it in the
      *
      *
-     * @param typeElem
+     * @param variableElement
      * @return
      */
-    public Class<? extends VariableModelBuilder> matchBuilder(TypeElement typeElem) {
+    public Class<? extends VariableModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
+        TypeMirror typeMirror = variableElement.asType();
 
-        String fieldClass = typeElem.getClass().getName();
 
-        Class<? extends VariableModelBuilder> res;
+        typeMirror = autobox(pe, typeMirror);
+
+
+        if(!(typeMirror instanceof DeclaredType)) {
+            return null;
+        }
+
+        return matchBuilder(pe, (TypeElement) ((DeclaredType)typeMirror).asElement());
+    }
+
+    public Class<? extends VariableModelBuilder> matchBuilder(ProcessingEnvironment pe, TypeElement typeElem) {
+
+        log(pe, Diagnostic.Kind.NOTE, "trying to match to (" + builderMap.toString() +")", typeElem);
+
+        String fieldClass = typeElem.getQualifiedName().toString();
+
+        Class<? extends VariableModelBuilder> res = null;
 
         if(builderMap.containsKey(fieldClass)) {
             res = builderMap.get(fieldClass);
+
+        }
+
+        if(res!=null) {
+            log(pe, Diagnostic.Kind.NOTE, "match:" + res, typeElem);
+
         }else {
-            DeclaredType parent = (DeclaredType) typeElem.getSuperclass();
+
+            DeclaredType parent = typeElem.getSuperclass() instanceof DeclaredType ? (DeclaredType) typeElem.getSuperclass() : null;
+
+            log(pe, Diagnostic.Kind.NOTE, "didn't match, will try parent:" + parent, typeElem);
+
             if(parent!=null) {
-                res = matchBuilder((TypeElement)parent.asElement());
+                res = matchBuilder(pe, (TypeElement)parent.asElement());
+                // continue searching up the interface line
+                if(res == null) {
+                    log(pe, Diagnostic.Kind.NOTE, "didn't match, will try interfaces", typeElem);
+
+                    for(TypeMirror ti:typeElem.getInterfaces()) {
+                        if(ti instanceof DeclaredType) {
+                            res = matchBuilder(pe, (TypeElement)((DeclaredType)ti).asElement() );
+                            if(res!=null) break;
+                        }
+
+                    }
+                }
             }else {
                 res = null;
             }
 
+        }
+
+        return res;
+    }
+    private void log(ProcessingEnvironment pe, Diagnostic.Kind kind, String msg, Element elem) {
+        pe.getMessager()
+                .printMessage(kind, msg, elem);
+    }
+
+    public static TypeMirror autobox(ProcessingEnvironment pe, TypeMirror typeMirror) {
+
+        TypeMirror res;
+
+        if (typeMirror.getKind().isPrimitive()) {
+            res = pe.getTypeUtils().boxedClass((PrimitiveType) typeMirror).asType();
+
+        } else if(typeMirror.getKind() == TypeKind.ARRAY){
+            res = pe.getTypeUtils().capture(typeMirror);
+        }else {
+            res = typeMirror;
         }
 
         return res;

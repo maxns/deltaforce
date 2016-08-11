@@ -12,7 +12,7 @@ import java.util.Set;
  */
 public class FieldModelBuilder extends VariableModelBuilder<FieldModel,Object> {
 
-    public static final Set<Class<Object>> FIELD_BASE_CLASSES = Collections.unmodifiableSet(new HashSet<>(Arrays.asList(Object.class)));;
+    public static final Class[] FIELD_BASE_CLASSES = {Object.class};
 
     public FieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
@@ -23,6 +23,7 @@ public class FieldModelBuilder extends VariableModelBuilder<FieldModel,Object> {
         FieldModelImpl res;
 
         res = new FieldModelImpl();
+
         res = applyCommon(res);
 
         res = box(res, element.asType());
