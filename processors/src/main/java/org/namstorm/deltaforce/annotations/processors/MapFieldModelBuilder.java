@@ -1,4 +1,5 @@
 package org.namstorm.deltaforce.annotations.processors;
+
 import org.namstorm.deltaforce.annotations.DeltaField;
 
 import javax.annotation.processing.ProcessingEnvironment;
@@ -13,7 +14,7 @@ import static javax.tools.Diagnostic.*;
  */
 public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Map> {
 
-    public static final Class[] FIELD_BASE_CLASSES={Map.class, HashMap.class};
+    public static final Class[] FIELD_BASE_CLASSES = {Map.class, HashMap.class};
 
     public MapFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
@@ -28,7 +29,7 @@ public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Ma
         DeclaredType ty = (DeclaredType) element.asType();
 
         whenAnnotated(DeltaField.class, a ->
-            mapRes.mapItem = a.mapItem()
+                mapRes.mapItem = a.mapItem()
         );
 
         mapRes.key = new FieldModelImpl();
@@ -39,22 +40,15 @@ public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Ma
         mapRes.boxedType = mapRes.type;
 
         // if we got T params
-        List<? extends TypeMirror> Targs = ty.getTypeArguments();
-
-        if (Targs == null || Targs.size() == 0) {
-            printMessage(Kind.WARNING, "No Type args specified for map");
-
-        }else if(Targs.size() == 2) {
-            mapRes.key = box(mapRes.key, Targs.get(0));
-            mapRes.value = box(mapRes.value, Targs.get(1));
-
-        } else {
+        if(onTypeArguments(
+                ta -> mapRes.key = box(mapRes.key, ta),
+                ta -> mapRes.value = box(mapRes.value, ta)
+        )!=2) {
             printMessage(Kind.WARNING, "Got an irregular number of type args in Map, ignoring");
         }
 
         return mapRes;
     }
-
 
 
 }

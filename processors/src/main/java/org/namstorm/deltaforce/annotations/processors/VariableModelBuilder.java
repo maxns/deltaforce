@@ -1,11 +1,17 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+import sun.reflect.generics.tree.TypeArgument;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.ArrayType;
+import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.reflect.Array;
+import java.util.List;
 import java.util.Set;
+import java.util.function.Consumer;
 
 import static javax.tools.Diagnostic.Kind;
 
@@ -120,9 +126,35 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
         fieldModel.accessible = !element.getModifiers().contains(Modifier.PRIVATE);
 
         fieldModel.name = element.getSimpleName().toString();
+        fieldModel.type = element.asType().toString();
 
         printMessage(Kind.NOTE, "created field model:" + fieldModel.toString());
 
         return fieldModel;
+    }
+
+    /**
+     * Invokes taConsumer on each type argument, in sequence
+     *
+     * Useful to construct funky calls like this:
+     *
+     * onTypeArguments(
+     *   ta -> mapRes.key = box(mapRes.key, ta),
+     *   ta -> mapRes.value = box(mapRes.value, ta)
+     *  );
+     *
+     * @param taConsumers
+     * @return
+     */
+    protected int onTypeArguments(Consumer<TypeMirror>... taConsumers) {
+        int res;
+
+        List<? extends TypeMirror> Targs = ((DeclaredType)element.asType()).getTypeArguments();
+
+        for(res=0; res<taConsumers.length && res<Targs.size(); res++) {
+            taConsumers[res].accept( Targs.get(res) );
+        }
+
+        return res;
     }
 }
