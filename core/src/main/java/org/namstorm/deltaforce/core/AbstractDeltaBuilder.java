@@ -107,11 +107,10 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
         return dc;
     }
 
-
-
     protected Delta delta(String field) {
         return deltaMap().get(field);
     }
+
     /**
      * Visit all deltas
      * @see DeltaVisitor

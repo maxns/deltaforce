@@ -62,14 +62,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     public $class_name set$alias(final ${field.key.type} key, final ${field.value.type} value) {
 
-        ${field.value.boxedType} curValue;
-
-        // get existing value
-        #if( ${field.primitive} )
-        curValue = ${field.boxedType}.valueOf( _from().get}$alias(key) );
-        #else
-        curValue = _from().get$alias(key);
-        #end
+        ${field.value.boxedType} curValue =
+        #if( ${field.primitive} ) ${field.boxedType}.valueOf( _from().get}$alias(key) );
+        #else _from().get$alias(key); #end
 
         Delta.OP op = compare(curValue, value);
 
