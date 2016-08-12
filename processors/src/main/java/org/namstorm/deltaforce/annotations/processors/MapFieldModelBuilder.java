@@ -1,18 +1,16 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.namstorm.deltaforce.annotations.DeltaField;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeMirror;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
-import static javax.tools.Diagnostic.*;
+import static javax.tools.Diagnostic.Kind;
 
 /**
  * Created by maxnam-storm on 10/8/2016.
  */
-public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Map> {
+public class MapFieldModelBuilder extends VariableFieldModelBuilder<MapFieldModel, Map> {
 
     public static final Class[] FIELD_BASE_CLASSES = {Map.class, HashMap.class};
 
@@ -28,13 +26,10 @@ public class MapFieldModelBuilder extends VariableModelBuilder<MapFieldModel, Ma
 
         DeclaredType ty = (DeclaredType) element.asType();
 
-        whenAnnotated(DeltaField.class, a ->
-                mapRes.mapItem = a.mapItem()
-        );
 
-        mapRes.key = new FieldModelImpl();
+        mapRes.key = new VariableFieldModel();
         mapRes.key.type = "Object";
-        mapRes.value = new FieldModelImpl();
+        mapRes.value = new VariableFieldModel();
         mapRes.value.type = "Object";
         mapRes.type = element.asType().toString();
         mapRes.boxedType = mapRes.type;

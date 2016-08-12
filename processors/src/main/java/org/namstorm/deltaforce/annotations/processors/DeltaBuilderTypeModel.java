@@ -8,13 +8,13 @@ package org.namstorm.deltaforce.annotations.processors;
  */
 public class DeltaBuilderTypeModel {
 
-    /** The package name. */
+    /** The package alias. */
     String packageName;
 
-    /** The class simple name. */
+    /** The class simple alias. */
     String className;
 
-    /** The class fully qualified name. */
+    /** The class fully qualified alias. */
     String qualifiedName;
 
     String deltaBuilderClassName;

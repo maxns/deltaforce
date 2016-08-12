@@ -1,16 +1,17 @@
-package org.namstorm.deltaforce.samples;
+package mock;
 
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
 /**
- * Created by maxnam-storm on 5/8/2016.
+ * Created by maxnam-storm on 11/8/2016.
  */
 @DeltaBuilder
-public class ComplexPerson extends Person{
+public class AnnotatedPojo {
     public int getIntValue() {
         return intValue;
     }
@@ -35,18 +36,20 @@ public class ComplexPerson extends Person{
         return doubleValue;
     }
 
+    public String getStringValue() {
+        return stringValue;
+    }
 
-
+    String stringValue;
     int intValue;
     short shortValue;
     long longValue;
     byte byteValue;
     float floatValue;
     double doubleValue;
-    //int[] intValues;
-    //private int[] privateIntValues;
 
-
+    //@DeltaField(alias="-s;+Item")
+    //Collection<String> strings;
 
     @DeltaField(ignore = true)
     Map transientMap;
@@ -57,6 +60,7 @@ public class ComplexPerson extends Person{
     public String getMetaValue(String key) {
         return metaValues.get(key);
     }
+
 
 
 }

@@ -16,13 +16,30 @@ public @interface DeltaField {
     boolean ignore() default false;
 
     /**
-     * Supply this for map fields - to provide a logical-sounding name for map accessors
-     * e.g.
+     * Supply this to override default naming behavior for fields
      *
-     * @return
-     * @DataField(mapItem="metaData") Map metaDataMap;
-     * <p>
-     * If not provided, the builders will call them set{FieldName>}Value
+     * If the alias is prefixed with a +, then it'll be treated as a suffix to alias
+     * if the alias is prefixed with a -, then whatever follows will be discarded from the name
+     * eg
+     * <code>
+     *     // This will make "setSurName" methods for this field
+     *     @DeltaField (alias="surName")
+     *     String lastName;
+     *
+     *     // This will make map setter calls setMetaValue
+     *     @DeltaField (alias="+Value")
+     *     Map&lt;String, String&gt; meta;
+     *
+     *     // This will make collection accessors called addItem/removeItem (without out the s)
+     *     @DeltaField (alas="-s")
+     *     Collection&lt;Integer&gt; items;
+     *
+     * </code>
+     * @see @link{VeloUtil.formatAlias()}
+     *
+     * Note that this also affects the "getXXXX" calls on the underlying object, but does not affect
+     * the direct access to fields code
+     *
      */
-    String mapItem() default "+Value";
+    String alias() default "+Value";
 }

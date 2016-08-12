@@ -3,11 +3,7 @@ package org.namstorm.deltaforce.samples.ledgers;
 import junit.framework.TestCase;
 import org.junit.Test;
 
-import java.io.PrintWriter;
 import java.io.StringWriter;
-
-import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by maxnamstorm on 9/8/2016.
@@ -32,7 +28,7 @@ public class SampleLedgerTest extends TestCase {
         ledger.commit();
 
         assertEquals("meta value check", "123", ledger.buyer().getMetaValue("membership"));
-        assertEquals("salesPerson first name check", "Alejandro", ledger.salesPerson().getFirstName());
+        assertEquals("salesPerson first alias check", "Alejandro", ledger.salesPerson().getFirstName());
         assertEquals("salesPerson lastname check", "Rodriguez", ledger.salesPerson().getLastName());
         assertEquals("salesPerson age check",  32, ledger.salesPerson().getAge());
 

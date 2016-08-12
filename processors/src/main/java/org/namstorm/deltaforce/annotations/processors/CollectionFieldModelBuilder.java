@@ -7,7 +7,7 @@ import java.util.Collection;
 /**
  * Created by maxnamstorm on 11/8/2016.
  */
-public class CollectionFieldModelBuilder extends VariableModelBuilder<CollectionFieldModel, Collection> {
+public class CollectionFieldModelBuilder extends VariableFieldModelBuilder<CollectionFieldModel, Collection> {
 
     public CollectionFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
@@ -18,11 +18,11 @@ public class CollectionFieldModelBuilder extends VariableModelBuilder<Collection
         CollectionFieldModel res = new CollectionFieldModel();
         applyCommon(res);
 
-        res.value = new FieldModelImpl();
-        res.value.type = "Object";
+        res.value = new VariableFieldModel();
+        res.value.type = "Object"; // default, untyped collection
         
 
-        // if we got T params
+        // if we got T param to specify
         if(onTypeArguments(
                 ta -> res.value = box(res.value, ta)
         )!=1) {

@@ -11,10 +11,13 @@ package org.namstorm.deltaforce.annotations.processors;
  *
  *
  */
-public class CollectionFieldModel extends FieldModelImpl {
+public class CollectionFieldModel extends VariableFieldModel {
     public static final String TYPE_COLLECTION = "collection";
 
-    public FieldModelImpl value;
+    /**
+     * This an archetype of the values inside collection
+     */
+    public VariableFieldModel value;
 
 
     @Override

@@ -1,16 +1,15 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import sun.reflect.generics.tree.TypeArgument;
+import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.ArrayType;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 import java.lang.reflect.Array;
 import java.util.List;
-import java.util.Set;
 import java.util.function.Consumer;
 
 import static javax.tools.Diagnostic.Kind;
@@ -20,13 +19,13 @@ import static javax.tools.Diagnostic.Kind;
  * <p>
  * Builds field models
  */
-public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement, M> {
+public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement, M> {
 
-    public VariableModelBuilder() {
+    public VariableFieldModelBuilder() {
         super();
     }
 
-    public VariableModelBuilder(ProcessingEnvironment processingEnvironment) {
+    public VariableFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);
         }
 
@@ -36,7 +35,6 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
      */
     public abstract M build();
 
-
     /**
      * boex it up
      * @param field
@@ -45,7 +43,7 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
      * @return
      */
 
-    protected <A extends FieldModelImpl> A box(A field, TypeMirror typeMirror) {
+    protected <A extends VariableFieldModel> A box(A field, TypeMirror typeMirror) {
 
         field.type = typeMirror.toString();
 
@@ -122,11 +120,14 @@ public abstract class VariableModelBuilder<M extends FieldModel, BaseClass> exte
      * @param fieldModel mutable FieldModel
      * @return fieldModel
      */
-    public <A extends FieldModelImpl> A applyCommon(final A fieldModel) {
+    public <A extends VariableFieldModel> A applyCommon(final A fieldModel) {
         fieldModel.accessible = !element.getModifiers().contains(Modifier.PRIVATE);
 
         fieldModel.name = element.getSimpleName().toString();
+        fieldModel.alias = DFUtil.compileAlias(fieldModel.name, null);
         fieldModel.type = element.asType().toString();
+
+        onAnnotation(DeltaField.class, a -> fieldModel.alias = DFUtil.compileAlias(fieldModel.name, a.alias()) );
 
         printMessage(Kind.NOTE, "created field model:" + fieldModel.toString());
 

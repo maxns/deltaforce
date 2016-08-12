@@ -2,18 +2,19 @@ package org.namstorm.deltaforce.annotations.processors;
 
 import org.apache.commons.lang.builder.ToStringBuilder;
 
-import javax.lang.model.element.VariableElement;
-
 /**
  * Created by maxnamstorm on 4/8/2016.
  */
-public class FieldModelImpl implements FieldModel {
+public class VariableFieldModel implements FieldModel {
     public static String TYPE_FIELD = "field";
 
     @Override
     public String getAccessorType() { return TYPE_FIELD; }
 
     String name;
+
+
+    String alias;
     String type;
     String boxedType;
 
@@ -41,10 +42,14 @@ public class FieldModelImpl implements FieldModel {
     }
 
     @Override
+    public String getAlias() { return alias; }
+
+    @Override
     public String toString() {
         return new ToStringBuilder(this)
                 .append("accessorType", getAccessorType())
                 .append("name", name)
+                .append("alias", alias)
                 .append("type", type)
                 .append("primitive", primitive)
                 .append("accessible", accessible)

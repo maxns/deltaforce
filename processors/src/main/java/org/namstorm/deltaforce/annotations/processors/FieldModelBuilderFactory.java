@@ -1,8 +1,5 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.apache.commons.lang3.reflect.TypeUtils;
-import org.apache.commons.validator.Var;
-
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -12,10 +9,9 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import java.lang.reflect.Array;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Type;
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created by maxnamstorm on 10/8/2016.
@@ -39,7 +35,7 @@ public class FieldModelBuilderFactory {
         initBuilderMap();
     }
 
-    private Map<String, Class<? extends VariableModelBuilder>> builderMap;
+    private Map<String, Class<? extends VariableFieldModelBuilder>> builderMap;
 
     private void initBuilderMap() {
         builderMap = new HashMap<>();
@@ -62,9 +58,9 @@ public class FieldModelBuilderFactory {
      * @param e
      * @return
      */
-    public VariableModelBuilder create(ProcessingEnvironment pe, VariableElement e)  {
+    public VariableFieldModelBuilder create(ProcessingEnvironment pe, VariableElement e)  {
 
-        Class<? extends VariableModelBuilder> res = matchBuilder(pe, e);
+        Class<? extends VariableFieldModelBuilder> res = matchBuilder(pe, e);
 
         if(res==null) {
             throw new IllegalArgumentException("Could not match:" + e + " with any builders");
@@ -73,7 +69,7 @@ public class FieldModelBuilderFactory {
 
 
         try {
-            return (VariableModelBuilder) res.getConstructor(ProcessingEnvironment.class).newInstance(pe).with(e);
+            return (VariableFieldModelBuilder) res.getConstructor(ProcessingEnvironment.class).newInstance(pe).with(e);
 
         } catch (InstantiationException e1) {
             log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
@@ -125,7 +121,7 @@ public class FieldModelBuilderFactory {
      * @param variableElement
      * @return
      */
-    public Class<? extends VariableModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
+    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
         TypeMirror typeMirror = variableElement.asType();
 
 
@@ -139,13 +135,13 @@ public class FieldModelBuilderFactory {
         return matchBuilder(pe, (TypeElement) ((DeclaredType)typeMirror).asElement());
     }
 
-    public Class<? extends VariableModelBuilder> matchBuilder(ProcessingEnvironment pe, TypeElement typeElem) {
+    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, TypeElement typeElem) {
 
         log(pe, Diagnostic.Kind.NOTE, "trying to match to (" + builderMap.toString() +")", typeElem);
 
         String fieldClass = typeElem.getQualifiedName().toString();
 
-        Class<? extends VariableModelBuilder> res = null;
+        Class<? extends VariableFieldModelBuilder> res = null;
 
         if(builderMap.containsKey(fieldClass)) {
             res = builderMap.get(fieldClass);

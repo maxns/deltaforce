@@ -1,14 +1,10 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import static com.google.common.truth.Truth.assertThat;
-
 import com.google.testing.compile.JavaFileObjects;
 import com.google.testing.compile.JavaSourceSubjectFactory;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
-
-import javax.tools.StandardLocation;
 
 import static com.google.common.truth.Truth.assert_;
 
@@ -30,7 +26,7 @@ public class DeltaBuilderProcessorTest {
     }
 
     @Test
-    public void matchBuilder() throws Exception {
+    public void testBasicProcessorMock() throws Exception {
 
         assert_().about(JavaSourceSubjectFactory.javaSource())
                 .that(JavaFileObjects.forResource("mock/AnnotatedPojo.java"))

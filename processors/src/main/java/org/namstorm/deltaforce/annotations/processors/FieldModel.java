@@ -10,4 +10,6 @@ public interface FieldModel extends ElementModel<VariableElement>{
 
     String getBoxedType();
 
+    String getAlias();
+
 }

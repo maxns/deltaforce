@@ -31,13 +31,13 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     // AccessorType : ${field.accessorType}
     #if( ${field.accessorType} == "field" )
-        #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+        #set ($alias = "${field.alias}")
     /**
     * Sets the value on the underlying and records a delta (if values are different)
     *
     * @return the property descriptor
     */
-    public $class_name set$fnInMethod(final $field.type newValue) {
+    public $class_name set$alias(final $field.type newValue) {
         // first check if we already have a delta of this field
         ${field.boxedType} curValue;
 
@@ -45,9 +45,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
             curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
         }else {
         #if( ${field.primitive} )
-            curValue = ${field.boxedType}.valueOf( _from().get$fnInMethod() );
+            curValue = ${field.boxedType}.valueOf( _from().get$alias() );
         #else
-            curValue = _from().get$fnInMethod();
+            curValue = _from().get$alias();
         #end
         }
 
@@ -58,21 +58,17 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
         return this;
     }
     #elseif( ${field.accessorType}=="map" )
-        #if( ${field.mapItem.substring(0,1)}=="+" )
-            #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
-        #else
-            #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
-        #end
+        #set ($alias = "${field.alias}")
 
-    public $class_name set$fnInMethod(final ${field.key.type} key, final ${field.value.type} value) {
+    public $class_name set$alias(final ${field.key.type} key, final ${field.value.type} value) {
 
         ${field.value.boxedType} curValue;
 
         // get existing value
         #if( ${field.primitive} )
-        curValue = ${field.boxedType}.valueOf( _from().get}$fnInMethod(key) );
+        curValue = ${field.boxedType}.valueOf( _from().get}$alias(key) );
         #else
-        curValue = _from().get$fnInMethod(key);
+        curValue = _from().get$alias(key);
         #end
 
         Delta.OP op = compare(curValue, value);
@@ -81,7 +77,10 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
         return this;
     }
+    #elseif (${field.accessorType}=="collection")
+
     #end
+
 #end
 
     /**
@@ -93,17 +92,17 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public ${model.className} apply(${model.className} to) {
 
         #foreach($field in $fields)
-            #set ($fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}")
+            #set ($alias = "${field.alias}")
 
             if(deltaMap().containsKey("${field.name}")){
             #if( ${field.accessorType} == "field" )
-                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$fnInMethod( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$alias( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
 
             #elseif (${field.accessorType} == "map")
                 #if( ${field.mapItem.substring(0,1)}=="+" )
-                    #set( $fnInMethod = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
+                    #set( $alias = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
                 #else
-                    #set ($fnInMethod = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
+                    #set ($alias = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
                 #end
 
             DeltaMap map = (DeltaMap) deltaMap().get("${field.name}");
@@ -112,7 +111,7 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
                     applyToMap(map, to.${field.name});
                 #else
                 for(${field.key.boxedType} key: map ) {
-                    to.set$fnInMethod(key, map.get(key));
+                    to.set$alias(key, map.get(key));
                 }
                 #end
 

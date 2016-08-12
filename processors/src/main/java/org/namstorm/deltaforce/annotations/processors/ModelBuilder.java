@@ -40,7 +40,7 @@ public abstract class ModelBuilder<E extends Element, T extends ElementModel<E>>
      * @param <A>
      * @return
      */
-    protected <A extends Annotation> A whenAnnotated(Class<A> annotClass, Consumer<A> consumer) {
+    protected <A extends Annotation> A onAnnotation(Class<A> annotClass, Consumer<A> consumer) {
 
         A a = element.getAnnotation(annotClass);
 
