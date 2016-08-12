@@ -54,7 +54,7 @@ public class DeltaCollection<T> extends Delta<Collection> implements Collection<
      * @return wether this was actually in the collection to begin with
      */
     public boolean removeDelta(T value){
-        getNewValue().remove(new Delta(REMOVE, "", null, value));
+        getNewValue().add(new Delta(REMOVE, "", null, value));
         return getOldValue().contains(value);
     }
 

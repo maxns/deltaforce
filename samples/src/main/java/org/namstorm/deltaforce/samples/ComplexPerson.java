@@ -3,10 +3,7 @@ package org.namstorm.deltaforce.samples;
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
@@ -51,7 +48,7 @@ public class ComplexPerson extends Person{
     List<String> nickNames;
 
     @DeltaField(alias = "rating")
-    Set<Number> ratingNumbers;
+    Set<Number> ratingNumbers = new HashSet<>();
 
 
     @DeltaField(ignore = true)

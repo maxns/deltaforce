@@ -73,10 +73,12 @@ public class ComplexPersonTest extends TestCase {
         ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
                 .addNickName(VAL_NICKNAME1)
                 .addNickName(VAL_NICKNAME2)
+                .addRating(123)
                 .build();
 
         assertTrue(VAL_NICKNAME1, testPerson.getNickNames().contains(VAL_NICKNAME1));
         assertTrue(VAL_NICKNAME2, testPerson.getNickNames().contains(VAL_NICKNAME2));
+        assertTrue(VAL_NICKNAME2, testPerson.getRatingNumbers().contains(123));
 
         //now lets see if removal works
 
@@ -91,14 +93,6 @@ public class ComplexPersonTest extends TestCase {
         assertTrue(VAL_NICKNAME2 + " should survive", testPerson.getNickNames().contains(VAL_NICKNAME2));
 
 
-        // now lets remove it
-
-        new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
-                .setMetaValue(VAL_META_NAME2, null)
-                .apply(testPerson);
-
-        assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
-        assertNull("Nulling of " + VAL_META_NAME2, testPerson.getMetaValue(VAL_META_NAME2));
 
 
     }
