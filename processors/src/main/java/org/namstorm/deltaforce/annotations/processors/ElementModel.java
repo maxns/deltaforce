@@ -8,7 +8,7 @@ import javax.lang.model.element.Element;
  */
 public interface ElementModel<T extends Element> {
 
-    boolean isAccessible();
+    boolean getAccessible();
 
     String getType();
 

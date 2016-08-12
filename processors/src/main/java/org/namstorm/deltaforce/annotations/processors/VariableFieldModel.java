@@ -27,7 +27,7 @@ public class VariableFieldModel implements FieldModel {
     }
 
     @Override
-    public boolean isAccessible() {
+    public boolean getAccessible() {
         return accessible;
     }
 

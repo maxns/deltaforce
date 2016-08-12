@@ -14,11 +14,12 @@ public class ComplexPersonTest extends TestCase {
     public static final int VAL_INT = 2;
     public static final short VAL_SHORT = 3;
     public static final long VAL_LONG = 10_000;
-    public static final int[] VAL_INT_ARR = new int[]{VAL_INT, VAL_INT + 1, VAL_INT + 2};
     public static final String VAL_META_NAME = "metaName";
     public static final String VAL_META_VALUE = "metaValue";
     public static final String VAL_META_NAME2 = "metaName2";
     public static final String VAL_META_VALUE2 = "metaValue2";
+    public static final String VAL_NICKNAME1 = "nickName1";
+    public static final String VAL_NICKNAME2 = "nickName2";
 
 
     @Test
@@ -29,7 +30,8 @@ public class ComplexPersonTest extends TestCase {
                 .setDoubleValue(VAL_DOUBLE)
                 .setFloatValue(VAL_FLOAT)
                 .setIntValue(VAL_INT)
-
+                .addNickName(VAL_NICKNAME1)
+                .addNickName(VAL_NICKNAME2)
                 .setShortValue(VAL_SHORT)
                 .setLongValue(VAL_LONG)
                 .setMetaValue(VAL_META_NAME,VAL_META_VALUE)
@@ -42,6 +44,9 @@ public class ComplexPersonTest extends TestCase {
         assertEquals(VAL_INT, testPerson.getIntValue());
         assertEquals(VAL_SHORT, testPerson.getShortValue());
 
+        assertTrue(VAL_NICKNAME1, testPerson.getNickNames().contains(VAL_NICKNAME1));
+        assertTrue(VAL_NICKNAME2, testPerson.getNickNames().contains(VAL_NICKNAME2));
+
         assertEquals(VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
 
         //now lets see if meta values survive
@@ -52,6 +57,39 @@ public class ComplexPersonTest extends TestCase {
 
         assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
         assertEquals("New meta value setup", VAL_META_VALUE2, testPerson.getMetaValue(VAL_META_NAME2));
+
+        // now lets remove it
+
+        new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
+                .setMetaValue(VAL_META_NAME2, null)
+                .apply(testPerson);
+
+        assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
+        assertNull("Nulling of " + VAL_META_NAME2, testPerson.getMetaValue(VAL_META_NAME2));
+
+
+    }
+    public void testCollections() throws Exception {
+        ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
+                .addNickName(VAL_NICKNAME1)
+                .addNickName(VAL_NICKNAME2)
+                .build();
+
+        assertTrue(VAL_NICKNAME1, testPerson.getNickNames().contains(VAL_NICKNAME1));
+        assertTrue(VAL_NICKNAME2, testPerson.getNickNames().contains(VAL_NICKNAME2));
+
+        //now lets see if removal works
+
+        new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
+                .removeNickName(VAL_NICKNAME1)
+                .apply(testPerson);
+
+        // removed?
+        assertFalse(VAL_NICKNAME1 + " should not survive", testPerson.getNickNames().contains(VAL_NICKNAME1));
+
+        // survived?
+        assertTrue(VAL_NICKNAME2 + " should survive", testPerson.getNickNames().contains(VAL_NICKNAME2));
+
 
         // now lets remove it
 

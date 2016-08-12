@@ -18,8 +18,20 @@ public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,
     }
     protected Map<K, V> map() { return getNewValue(); }
 
+
     public void addDelta(K fieldName, V d) {
         map().put(fieldName, d);
+    }
+
+    /**
+     * applies delta to map
+     *
+     * @param to
+     */
+    public Map<K,V> applyTo(Map<K,V> to) {
+
+        return DeltaUtil.applyMapDeltas(this, to);
+
     }
 
 

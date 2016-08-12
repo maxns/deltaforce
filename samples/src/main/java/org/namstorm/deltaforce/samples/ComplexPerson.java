@@ -4,7 +4,9 @@ import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
@@ -37,15 +39,19 @@ public class ComplexPerson extends Person{
 
 
 
+
     int intValue;
     short shortValue;
     long longValue;
     byte byteValue;
     float floatValue;
     double doubleValue;
-    //int[] intValues;
-    //private int[] privateIntValues;
 
+    @DeltaField(alias = "-s")
+    List<String> nickNames;
+
+    @DeltaField(alias = "rating")
+    Set<Number> ratingNumbers;
 
 
     @DeltaField(ignore = true)
@@ -59,4 +65,11 @@ public class ComplexPerson extends Person{
     }
 
 
+    public List<String> getNickNames() {
+        return nickNames;
+    }
+
+    public Set<Number> getRatingNumbers() {
+        return ratingNumbers;
+    }
 }

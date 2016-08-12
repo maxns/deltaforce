@@ -1,5 +1,8 @@
 package org.namstorm.deltaforce.core;
 
+import org.namstorm.fluency.OnBooleanResult;
+
+import java.util.Collection;
 import java.util.Map;
 
 /**
@@ -71,18 +74,44 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
         map.addDelta(fieldDelta.getFieldName(), fieldDelta);
     }
 
+    protected <C> void addToCollection(String colFieldName, Collection<C> curCol, C valueToAdd) {
+
+        getCollectionDelta(colFieldName, curCol).addDelta(valueToAdd);
+    }
+
     /**
-     * applies delta to map
      *
-     * @param from
-     * @param to
+     * @param colFieldName
+     * @param curCol
+     * @param removeValue
+     * @param <C>
+     * @return OnBooleanResult - true if object existed in the original collection
+     *
+     * @link{OnBooleanResult}
      */
-    protected void applyToMap(DeltaMap from, Map to) {
-        DeltaUtil.applyMapDeltas(from, to);
+    protected <C> OnBooleanResult removeFromCollection(String colFieldName, Collection<C> curCol, C removeValue) {
+
+        return OnBooleanResult.cast(getCollectionDelta(colFieldName, curCol).removeDelta(removeValue));
+    }
+
+
+    private <C> DeltaCollection<C> getCollectionDelta(String colFieldName, Collection<C> curCol) {
+        // oh yeah, delta of collection of deltas of C...
+        DeltaCollection<C> dc = (DeltaCollection<C>) deltaMap().get(colFieldName);
+
+        if(dc == null) {
+            dc = new DeltaCollection<>(Delta.OP.UPDATE, colFieldName, curCol);
+            addDelta(dc); // store the delta of the collection (not the item)
+        }
+
+        return dc;
     }
 
 
 
+    protected Delta delta(String field) {
+        return deltaMap().get(field);
+    }
     /**
      * Visit all deltas
      * @see DeltaVisitor

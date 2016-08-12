@@ -9,6 +9,7 @@ import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.tools.generic.DisplayTool;
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
 import javax.annotation.processing.*;
 import javax.lang.model.SourceVersion;
@@ -237,6 +238,7 @@ public class DeltaBuilderProcessor
         vc.put("model", model);
         vc.put("fields", fields);
         vc.put("date", new Date().toString());
+        vc.put("util", DFUtil.INSTANCE);
 
         // adding DisplayTool from Velocity Tools library
         vc.put("display", new DisplayTool());

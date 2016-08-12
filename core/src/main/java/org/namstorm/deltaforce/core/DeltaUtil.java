@@ -1,5 +1,7 @@
 package org.namstorm.deltaforce.core;
 
+import org.namstorm.fluency.OnIntResult;
+
 import java.util.*;
 import java.util.function.Consumer;
 
@@ -7,6 +9,8 @@ import java.util.function.Consumer;
  * Created by maxnamstorm on 6/8/2016.
  */
 public class DeltaUtil {
+
+
     public static class ApplyToMap extends RecursiveDeltaMapVisitor {
 
         @Override
@@ -70,9 +74,8 @@ public class DeltaUtil {
      * @param from
      * @return
      */
-    public static Map applyMapDeltas(final DeltaMap from, final Map to) {
+    public static Map applyMapDeltas(final DeltaMap from, final Map<?,?> to) {
         DeltaUtil.visitDeltas(from, new ApplyToMap(to));
-
         return to;
     }
 
@@ -84,5 +87,6 @@ public class DeltaUtil {
      */
     public static void visitDeltas(DeltaMap deltaMap, DeltaVisitor visitor) {
         deltaMap.map().values().forEach(o -> visitor.visit((Delta<?>) o));
+
     }
 }

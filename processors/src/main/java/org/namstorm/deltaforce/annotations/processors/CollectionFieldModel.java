@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+
 /**
  * Created by maxnam-storm on 10/8/2016.
  *
@@ -14,10 +15,14 @@ package org.namstorm.deltaforce.annotations.processors;
 public class CollectionFieldModel extends VariableFieldModel {
     public static final String TYPE_COLLECTION = "collection";
 
+    public VariableFieldModel getValue() {
+        return value;
+    }
+
     /**
      * This an archetype of the values inside collection
      */
-    public VariableFieldModel value;
+    VariableFieldModel value;
 
 
     @Override

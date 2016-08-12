@@ -8,6 +8,7 @@ import java.util.Collection;
  * Created by maxnamstorm on 11/8/2016.
  */
 public class CollectionFieldModelBuilder extends VariableFieldModelBuilder<CollectionFieldModel, Collection> {
+    public static final Class[] FIELD_BASE_CLASSES = {java.util.Collection.class};
 
     public CollectionFieldModelBuilder(ProcessingEnvironment processingEnvironment) {
         super(processingEnvironment);

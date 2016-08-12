@@ -79,6 +79,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     }
     #elseif (${field.accessorType}=="collection")
 
+    public $class_name add${field.alias}(final ${field.value.type} value) { addToCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get$alias() #end, value ); return this; }
+    public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get$alias() #end, value); return this; }
+
     #end
 
 #end
@@ -97,24 +100,20 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
             if(deltaMap().containsKey("${field.name}")){
             #if( ${field.accessorType} == "field" )
                 to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$alias( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
-
             #elseif (${field.accessorType} == "map")
-                #if( ${field.mapItem.substring(0,1)}=="+" )
-                    #set( $alias = "${field.name.substring(0,1).toUpperCase()}${field.name.substring(1)}${field.mapItem.substring(1)}" )
-                #else
-                    #set ($alias = "${field.mapItem.substring(0,1).toUpperCase()}${field.mapItem.substring(1)}" )
-                #end
-
-            DeltaMap map = (DeltaMap) deltaMap().get("${field.name}");
-
                 #if( ${field.accessible} )
-                    applyToMap(map, to.${field.name});
+                delta("${field.name}").applyTo(to.${field.name});
                 #else
                 for(${field.key.boxedType} key: map ) {
                     to.set$alias(key, map.get(key));
                 }
                 #end
-
+            #elseif (${field.accessorType}=="collection")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set${util.string.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.string.capitalizeFirstLetter($field.name)}());
+                #end
 
             #end
             }

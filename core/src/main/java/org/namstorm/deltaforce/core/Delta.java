@@ -39,4 +39,9 @@ public class Delta<T> {
     public T getNewValue() {
         return newValue;
     }
+
+    public T applyTo(T to) {
+        to = this.getNewValue();
+        return to;
+    }
 }

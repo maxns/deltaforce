@@ -1,5 +1,8 @@
 package org.namstorm.deltaforce.annotations.processors;
 
+import org.apache.oro.text.regex.StringSubstitution;
+import org.apache.velocity.util.StringUtils;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
@@ -27,7 +30,9 @@ public class FieldModelBuilderFactory {
      */
     private static Object[][] BUILDERS = {
             {MapFieldModelBuilder.FIELD_BASE_CLASSES, MapFieldModelBuilder.class},
-            {FieldModelBuilder.FIELD_BASE_CLASSES, FieldModelBuilder.class}
+            {FieldModelBuilder.FIELD_BASE_CLASSES, FieldModelBuilder.class},
+            {CollectionFieldModelBuilder.FIELD_BASE_CLASSES, CollectionFieldModelBuilder.class}
+
     };
 
     public FieldModelBuilderFactory() {
@@ -63,7 +68,7 @@ public class FieldModelBuilderFactory {
         Class<? extends VariableFieldModelBuilder> res = matchBuilder(pe, e);
 
         if(res==null) {
-            throw new IllegalArgumentException("Could not match:" + e + " with any builders");
+            throw new IllegalArgumentException("Could not match:" + fmt(e) + " with any builders, check assignments");
         }
 
 
@@ -85,6 +90,10 @@ public class FieldModelBuilderFactory {
             e1.printStackTrace();
         }
         return null;
+    }
+
+    private String fmt(VariableElement e) {
+        return e.toString()+"["+ String.join(",", e.getKind().toString(), e.asType().toString(), e.getSimpleName());
     }
 
 
@@ -159,20 +168,21 @@ public class FieldModelBuilderFactory {
 
             if(parent!=null) {
                 res = matchBuilder(pe, (TypeElement)parent.asElement());
-                // continue searching up the interface line
-                if(res == null) {
-                    log(pe, Diagnostic.Kind.NOTE, "didn't match, will try interfaces", typeElem);
-
-                    for(TypeMirror ti:typeElem.getInterfaces()) {
-                        if(ti instanceof DeclaredType) {
-                            res = matchBuilder(pe, (TypeElement)((DeclaredType)ti).asElement() );
-                            if(res!=null) break;
-                        }
-
-                    }
-                }
             }else {
                 res = null;
+            }
+
+            // continue searching up the interface line
+            if(res == null) {
+                log(pe, Diagnostic.Kind.NOTE, "didn't match, will try interfaces", typeElem);
+
+                for(TypeMirror ti:typeElem.getInterfaces()) {
+                    if(ti instanceof DeclaredType) {
+                        res = matchBuilder(pe, (TypeElement)((DeclaredType)ti).asElement() );
+                        if(res!=null) break;
+                    }
+
+                }
             }
 
         }

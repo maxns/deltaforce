@@ -2,6 +2,8 @@ package org.namstorm.deltaforce.annotations.processors.util;
 
 import org.apache.velocity.util.StringUtils;
 
+import java.util.function.Consumer;
+
 /**
  * Created by maxnam-storm on 12/8/2016.
  *
@@ -9,6 +11,8 @@ import org.apache.velocity.util.StringUtils;
  */
 public class DFUtil {
 
+    public static final DFUtil INSTANCE = new DFUtil();
+    public static final StringUtils STRING_UTILS = new StringUtils();
 
     /**
      * @param name

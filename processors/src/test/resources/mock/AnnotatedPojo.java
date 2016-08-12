@@ -6,6 +6,7 @@ import org.namstorm.deltaforce.annotations.DeltaField;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 /**
  * Created by maxnam-storm on 11/8/2016.
@@ -48,8 +49,11 @@ public class AnnotatedPojo {
     float floatValue;
     double doubleValue;
 
-    //@DeltaField(alias="-s;+Item")
-    //Collection<String> strings;
+    @DeltaField(alias="-s;+Item")
+    Collection<String> strings;
+
+    @DeltaField(alias="-s")
+    List<Integer> numbers = new java.util.ArrayList<>();
 
     @DeltaField(ignore = true)
     Map transientMap;
