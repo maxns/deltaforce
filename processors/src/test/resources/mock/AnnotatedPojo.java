@@ -61,6 +61,12 @@ public class AnnotatedPojo {
     @DeltaField(alias = "metaValue")
     HashMap<String,String> metaValues = new HashMap<>();
 
+
+    private Collection<String> extraKeys;
+
+    public Collection<String> getExtraKeys() { return extraKeys; }
+    public void setExtraKeys(Collection<String> extraKeys) { this.extraKeys = extraKeys; }
+
     public String getMetaValue(String key) {
         return metaValues.get(key);
     }

@@ -10,6 +10,25 @@ import java.util.UUID;
  */
 @DeltaBuilder
 public class Order {
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    String description;
+
+    public Order(){
+        super();
+    }
+    public Order(UUID productId, String description) {
+        super();
+        this.productId = productId;
+        this.description = description;
+    }
+
     Date dateTime;
 
     public UUID getProductId() {

@@ -1,6 +1,7 @@
 package org.namstorm.deltaforce.ledgers;
 
 import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
 import org.namstorm.deltaforce.core.Delta;
 import org.namstorm.deltaforce.core.RecursiveDeltaMapVisitor;
 

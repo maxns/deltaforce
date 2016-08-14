@@ -63,7 +63,7 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public $class_name set$alias(final ${field.key.type} key, final ${field.value.type} value) {
 
         ${field.value.boxedType} curValue =
-        #if( ${field.primitive} ) ${field.boxedType}.valueOf( _from().get}$alias(key) );
+        #if( ${field.primitive} ) ${field.boxedType}.valueOf( _from().get$alias(key) );
         #else _from().get$alias(key); #end
 
         Delta.OP op = compare(curValue, value);
@@ -74,8 +74,8 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     }
     #elseif (${field.accessorType}=="collection")
 
-    public $class_name add${field.alias}(final ${field.value.type} value) { addToCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get$alias() #end, value ); return this; }
-    public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get$alias() #end, value); return this; }
+    public $class_name add${field.alias}(final ${field.value.type} value) { addToCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value ); return this; }
+    public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value); return this; }
 
     #end
 
@@ -107,7 +107,7 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
                 #if( ${field.accessible} )
                 to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
                 #else
-                to.set${util.string.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.string.capitalizeFirstLetter($field.name)}());
+                to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.StringUtils.capitalizeFirstLetter($field.name)}()) );
                 #end
 
             #end

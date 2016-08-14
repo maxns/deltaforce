@@ -103,11 +103,15 @@ public class DeltaBuilderProcessor
                 if (elem.getKind() == ElementKind.CLASS) {
 
                     model = new DeltaBuilderTypeModel();
+
+
+
                     Map<String, FieldModel> fields = new HashMap<>();
                     modelMap.put(model, fields);
 
                     TypeElement classElement = (TypeElement) elem;
                     PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
+
                     DeltaBuilder annotation = classElement.getAnnotation(DeltaBuilder.class);
 
                     model.packageName = packageElement.getQualifiedName().toString();

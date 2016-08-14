@@ -47,4 +47,7 @@ public class DFUtil {
         return res;
     }
 
+    public StringUtils getStringUtils() {
+        return STRING_UTILS;
+    }
 }
