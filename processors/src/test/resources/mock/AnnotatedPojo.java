@@ -41,6 +41,32 @@ public class AnnotatedPojo {
         return stringValue;
     }
 
+    public Collection<String> getExtraKeys() { return extraKeys; }
+    public void setExtraKeys(Collection<String> extraKeys) { this.extraKeys = extraKeys; }
+
+    public String getMetaValue(String key) {
+        return metaValues.get(key);
+    }
+
+    public AnnotatedPojo getParent() {
+        return parent;
+    }
+
+    public void setParent(AnnotatedPojo parent) {
+        this.parent = parent;
+    }
+
+    public AnnotatedPojo getChild() {
+        return child;
+    }
+
+    public void setChild(AnnotatedPojo child) {
+        this.child = child;
+    }
+
+    /**
+     * Simple values
+     */
     String stringValue;
     int intValue;
     short shortValue;
@@ -49,12 +75,32 @@ public class AnnotatedPojo {
     float floatValue;
     double doubleValue;
 
+    /**
+     * override default behaviour and don't map it to a builder
+     */
+    @DeltaField(type = DeltaField.Type.FIELD, alias = "")
+    private AnnotatedPojo parent;
+
+
+    /**
+     * THis will be mapped to a builder
+     */
+    private AnnotatedPojo child;
+
+    /**
+     * Collection types
+     */
     @DeltaField(alias="-s;+Item")
     Collection<String> strings;
 
     @DeltaField(alias="-s")
     List<Integer> numbers = new java.util.ArrayList<>();
 
+    private Collection<String> extraKeys;
+
+    /**
+     * Maps
+     */
     @DeltaField(ignore = true)
     Map transientMap;
 
@@ -62,14 +108,6 @@ public class AnnotatedPojo {
     HashMap<String,String> metaValues = new HashMap<>();
 
 
-    private Collection<String> extraKeys;
-
-    public Collection<String> getExtraKeys() { return extraKeys; }
-    public void setExtraKeys(Collection<String> extraKeys) { this.extraKeys = extraKeys; }
-
-    public String getMetaValue(String key) {
-        return metaValues.get(key);
-    }
 
 
 

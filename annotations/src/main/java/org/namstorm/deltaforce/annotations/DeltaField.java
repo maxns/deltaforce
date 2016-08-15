@@ -7,12 +7,27 @@ import java.lang.annotation.*;
  */
 @Documented
 @Target({
-        ElementType.TYPE,
-        ElementType.FIELD,
-        ElementType.METHOD
+        ElementType.FIELD
 })
 @Retention(RetentionPolicy.SOURCE)
 public @interface DeltaField {
+    enum Type {
+        /** auto-detect */
+        AUTO,
+        /** access like a field */
+        FIELD,
+        /** access like a map (set/remove) */
+        MAP,
+        /** access like a collection (add/remove) */
+        COLLECTION,
+        /** access like a builder (FIELD + modify) */
+        BUILDER
+    };
+
+    /**
+     * Set this to true and this field will be ignore
+     * @return
+     */
     boolean ignore() default false;
 
     /**
@@ -42,4 +57,19 @@ public @interface DeltaField {
      *
      */
     String alias() default "+Value";
+
+    /**
+     * Define what kind of a field this is
+     *
+     * AUTO - is the default, so the framework will try to figure out itself, by examining the type
+     *
+     * FIELD - basic set/getters for all primitive and declared, and then have special accessors for maps and collections.
+     *
+     * MAP/COLLECTION - as states on the box, 'set / remove' for MAP and 'add/remove' for collection
+     *
+     * BUILDER - is like auto + creates a "editXXX" field that actually returns the builder
+     *
+     * @return
+     */
+    Type type() default Type.AUTO;
 }

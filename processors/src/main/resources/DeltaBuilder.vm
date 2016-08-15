@@ -77,6 +77,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public $class_name add${field.alias}(final ${field.value.type} value) { addToCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value ); return this; }
     public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value); return this; }
 
+    #elseif (${field.accessorType}=="buildable")
+
+    public ${field.builderClassName} edit${field.alias}() { return editBuildable("$field.alias"); }
     #end
 
 #end
@@ -109,7 +112,12 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
                 #else
                 to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.StringUtils.capitalizeFirstLetter($field.name)}()) );
                 #end
-
+            #elseif (${field.accessorType}=="buildable")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.StringUtils.capitalizeFirstLetter($field.name)}()) );
+                #end
             #end
             }
         #end

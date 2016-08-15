@@ -13,9 +13,10 @@ public abstract class OnResult<T> {
     public interface ResultConsumer<T> extends Consumer<T> {
     }
 
+
     public OnResult(T result) {
         this.result = result;
     }
 
-    T result;
+    protected T result;
 }

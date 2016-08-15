@@ -218,7 +218,6 @@ public class DeltaBuilderProcessor
      * @param dfa
      * @return
      */
-    static final String MAP_CLASS = HashMap.class.getCanonicalName();
 
     private FieldModel createFieldModel(VariableElement ve, DeltaField dfa) throws InstantiationException, IllegalAccessException, NoSuchMethodException, InvocationTargetException {
 

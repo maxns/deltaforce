@@ -1,7 +1,8 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.apache.oro.text.regex.StringSubstitution;
-import org.apache.velocity.util.StringUtils;
+import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.processors.util.DFProcessorUtil;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -20,6 +21,11 @@ import java.util.Map;
  * Created by maxnamstorm on 10/8/2016.
  */
 public class FieldModelBuilderFactory {
+    public static final Class<BuildableFieldModelBuilder> BUILDABLE_FIELD_MODEL_BUILDER_CLASS = BuildableFieldModelBuilder.class;
+    public static final Class<CollectionFieldModelBuilder> COLLECTION_FIELD_MODEL_BUILDER_CLASS = CollectionFieldModelBuilder.class;
+    public static final Class<MapFieldModelBuilder> MAP_FIELD_MODEL_BUILDER_CLASS = MapFieldModelBuilder.class;
+    public static final Class<FieldModelBuilder> FIELD_MODEL_BUILDER_CLASS = FieldModelBuilder.class;
+
     private static FieldModelBuilderFactory _instance;
     public static FieldModelBuilderFactory getInstance() {
         return _instance != null ? _instance : new FieldModelBuilderFactory();
@@ -29,9 +35,10 @@ public class FieldModelBuilderFactory {
      * Temporary hack, until we make this configurable
      */
     private static Object[][] BUILDERS = {
-            {MapFieldModelBuilder.FIELD_BASE_CLASSES, MapFieldModelBuilder.class},
-            {FieldModelBuilder.FIELD_BASE_CLASSES, FieldModelBuilder.class},
-            {CollectionFieldModelBuilder.FIELD_BASE_CLASSES, CollectionFieldModelBuilder.class}
+            {MapFieldModelBuilder.FIELD_BASE_CLASSES, MAP_FIELD_MODEL_BUILDER_CLASS},
+            {FieldModelBuilder.FIELD_BASE_CLASSES, FIELD_MODEL_BUILDER_CLASS},
+            {CollectionFieldModelBuilder.FIELD_BASE_CLASSES, COLLECTION_FIELD_MODEL_BUILDER_CLASS},
+            {BuildableFieldModelBuilder.FIELD_BASE_CLASSES, BUILDABLE_FIELD_MODEL_BUILDER_CLASS}
 
     };
 
@@ -98,7 +105,58 @@ public class FieldModelBuilderFactory {
 
 
     /**
-     * Matches typeMirror to the builder using "most closely matched" class
+     * Attempts to match the right builder by:
+     *  1. reading what the annotation say in its' type argument in its' @DeltaField field annotation
+     *  2. if the class of the field itself is annotated with @DeltaBuilder
+     *  3. finally match with something in the builder map
+     *
+     * @See autoMatchBuilder
+     * @see org.namstorm.deltaforce.annotations.DeltaField.Type
+     *
+     * @param variableElement
+     * @return
+     */
+    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
+        Class<? extends VariableFieldModelBuilder> res = matchBuilderFomAnnotation(pe, variableElement);
+
+        if(res!=null) {
+            return res;
+        }
+
+        TypeMirror typeMirror = variableElement.asType();
+
+        typeMirror = autobox(pe, typeMirror);
+
+        if(!(typeMirror instanceof DeclaredType)) {
+            return null;
+        }
+
+        return autoMatchBuilder(pe, (TypeElement) ((DeclaredType)typeMirror).asElement());
+    }
+
+    /**
+     * Matches builder from annotation only
+     * @param pe
+     * @param variableElement
+     * @return
+     */
+    @SuppressWarnings(value = "unchecked")
+    private Class<? extends VariableFieldModelBuilder> matchBuilderFomAnnotation(ProcessingEnvironment pe, VariableElement variableElement) {
+
+        return (Class<? extends VariableFieldModelBuilder>) DFProcessorUtil.onAnnotations(variableElement, DeltaField.class, (Class) null)
+                .select(ann -> {
+                    switch(ann.type()) {
+                        case FIELD: return FIELD_MODEL_BUILDER_CLASS;
+                        case MAP: return MAP_FIELD_MODEL_BUILDER_CLASS;
+                        case COLLECTION: return COLLECTION_FIELD_MODEL_BUILDER_CLASS;
+                        case BUILDER: return BUILDABLE_FIELD_MODEL_BUILDER_CLASS;
+                    }
+                    return null;
+                });
+    }
+
+    /**
+     * Matches typeElem to the appropriate builder using "most closely matched" class / interface
      * e.g.
      *  let's say we have these builders with these field base classes
      *
@@ -127,24 +185,12 @@ public class FieldModelBuilderFactory {
      *  it in the
      *
      *
-     * @param variableElement
+     * @param pe
+     * @param typeElem
      * @return
      */
-    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
-        TypeMirror typeMirror = variableElement.asType();
+    public Class<? extends VariableFieldModelBuilder> autoMatchBuilder(ProcessingEnvironment pe, TypeElement typeElem) {
 
-
-        typeMirror = autobox(pe, typeMirror);
-
-
-        if(!(typeMirror instanceof DeclaredType)) {
-            return null;
-        }
-
-        return matchBuilder(pe, (TypeElement) ((DeclaredType)typeMirror).asElement());
-    }
-
-    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, TypeElement typeElem) {
 
         log(pe, Diagnostic.Kind.NOTE, "trying to match to (" + builderMap.toString() +")", typeElem);
 
@@ -154,36 +200,43 @@ public class FieldModelBuilderFactory {
 
         if(builderMap.containsKey(fieldClass)) {
             res = builderMap.get(fieldClass);
+        }else {
+            if(DFProcessorUtil.onAnnotations(typeElem, DeltaBuilder.class, Boolean.FALSE).select(a -> true)) {
+                res = BUILDABLE_FIELD_MODEL_BUILDER_CLASS;
+            }
 
         }
+
 
         if(res!=null) {
             log(pe, Diagnostic.Kind.NOTE, "match:" + res, typeElem);
 
         }else {
-
-            DeclaredType parent = typeElem.getSuperclass() instanceof DeclaredType ? (DeclaredType) typeElem.getSuperclass() : null;
-
-            log(pe, Diagnostic.Kind.NOTE, "didn't match, will try parent:" + parent, typeElem);
-
-            if(parent!=null) {
-                res = matchBuilder(pe, (TypeElement)parent.asElement());
-            }else {
-                res = null;
-            }
-
             // continue searching up the interface line
             if(res == null) {
-                log(pe, Diagnostic.Kind.NOTE, "didn't match, will try interfaces", typeElem);
+                log(pe, Diagnostic.Kind.NOTE, "didn't match, will try interfaces:"+typeElem.getInterfaces(), typeElem);
 
                 for(TypeMirror ti:typeElem.getInterfaces()) {
                     if(ti instanceof DeclaredType) {
-                        res = matchBuilder(pe, (TypeElement)((DeclaredType)ti).asElement() );
+                        res = autoMatchBuilder(pe, (TypeElement)((DeclaredType)ti).asElement() );
                         if(res!=null) break;
                     }
 
                 }
             }
+            if(res == null) {
+                DeclaredType parent = typeElem.getSuperclass() instanceof DeclaredType ? (DeclaredType) typeElem.getSuperclass() : null;
+
+                log(pe, Diagnostic.Kind.NOTE, "didn't match, will try parent:" + parent, typeElem);
+
+                if (parent != null) {
+                    res = autoMatchBuilder(pe, (TypeElement) parent.asElement());
+                } else {
+                    res = null;
+                }
+            }
+
+
 
         }
 
