@@ -79,6 +79,13 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
         getCollectionDelta(colFieldName, curCol).addDelta(valueToAdd);
     }
 
+    protected <O, B extends DeltaBuilder<O>> B addBuilderDelta(String mapFieldName, O curValue, O newValue, B builder) {
+
+        BuilderDelta<O> res = new BuilderDelta<>(Delta.OP.UPDATE, mapFieldName, curValue, newValue, builder);
+
+        return (B) res.getBuilder();
+
+    }
 
 
 
