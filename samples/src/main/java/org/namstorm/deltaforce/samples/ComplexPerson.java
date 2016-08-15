@@ -34,6 +34,18 @@ public class ComplexPerson extends Person{
         return doubleValue;
     }
 
+    public String getMetaValue(String key) {
+        return metaValues.get(key);
+    }
+
+
+    public List<String> getNickNames() {
+        return nickNames;
+    }
+
+    public Set<Number> getRatingNumbers() {
+        return ratingNumbers;
+    }
 
 
 
@@ -57,16 +69,30 @@ public class ComplexPerson extends Person{
     @DeltaField(alias = "metaValue")
     HashMap<String,String> metaValues = new HashMap<>();
 
-    public String getMetaValue(String key) {
-        return metaValues.get(key);
+    Person publicPerson;
+
+    public Person getPrivatePerson() {
+        return privatePerson;
     }
 
-
-    public List<String> getNickNames() {
-        return nickNames;
+    public void setPrivatePerson(Person privatePerson) {
+        this.privatePerson = privatePerson;
     }
 
-    public Set<Number> getRatingNumbers() {
-        return ratingNumbers;
+    private Person privatePerson;
+
+
+    ComplexPerson brother;
+
+    public ComplexPerson getNonBuildingBrother() {
+        return nonBuildingBrother;
     }
+
+    public void setNonBuildingBrother(ComplexPerson nonBuildingBrother) {
+        this.nonBuildingBrother = nonBuildingBrother;
+    }
+
+    @DeltaField(type=DeltaField.Type.FIELD)
+    private ComplexPerson nonBuildingBrother;
+
 }

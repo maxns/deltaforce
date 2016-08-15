@@ -69,6 +69,8 @@ public class ComplexPersonTest extends TestCase {
 
 
     }
+
+    @Test
     public void testCollections() throws Exception {
         ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
                 .addNickName(VAL_NICKNAME1)
@@ -92,6 +94,24 @@ public class ComplexPersonTest extends TestCase {
         // survived?
         assertTrue(VAL_NICKNAME2 + " should survive", testPerson.getNickNames().contains(VAL_NICKNAME2));
 
+
+
+
+    }
+    @Test
+    public void testBuildable() throws Exception {
+        org.namstorm.deltaforce.samples.ComplexPersonBuilder builder = new org.namstorm.deltaforce.samples.ComplexPersonBuilder();
+
+        builder.editBrother().setFirstName("Alex").setAge(44);
+        builder.editPrivatePerson().setFirstName("Mickey").setAge(50);
+        builder.setNonBuildingBrother(builder.editBrother().build());
+
+        ComplexPerson testPerson = builder.build();
+
+        assertEquals("brother", "Alex", testPerson.brother.getFirstName());
+        assertEquals("privatePerson", "Mickey", testPerson.getPrivatePerson().getFirstName());
+        assertEquals("nobBuildingBrother", "Alex", testPerson.getNonBuildingBrother().getFirstName());
+        assertNotSame("brother and non-building brother", testPerson.brother, testPerson.getNonBuildingBrother());
 
 
 

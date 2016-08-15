@@ -18,8 +18,10 @@ public class BuildableFieldModelBuilder extends VariableFieldModelBuilder<Builda
     public BuildableFieldModel build() {
         BuildableFieldModel res = new BuildableFieldModel();
 
+        res = applyCommon(res);
+
         res.setBuilderClassName(
-                element.getSimpleName() + "Builder"
+                element.asType().toString() + "Builder"
         );
 
         return res;

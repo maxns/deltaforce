@@ -20,6 +20,7 @@ import javax.annotation.Generated;
 public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     public $class_name($model.className from) {super(from);}
+    public $class_name() {super(new ${model.className}());}
 
     @Override public $model.className create() { return new ${model.className}(); }
 
@@ -78,8 +79,24 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value); return this; }
 
     #elseif (${field.accessorType}=="buildable")
+    #set ($builderField = "${field.name}Builder")
+    private ${field.builderClassName} $builderField;
 
-    public ${field.builderClassName} edit${field.alias}() { return editBuildable("$field.alias"); }
+    public ${field.builderClassName} edit${field.alias}() {
+
+        if(${builderField} == null) {
+
+            if(delta("${field.name})==null) {
+                ${field.type} curValue = #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end ;
+            }
+            addDelta(new Delta(op, "${field.name}", curValue, newValue)); //TODO: finish
+
+            ${builderField} = new ${field.builderClassName}(curValue);
+        }
+
+
+        return ${builderField}.from( (${field.type}) delta("${field.name}").getOldValue() );
+    }
     #end
 
 #end

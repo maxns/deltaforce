@@ -56,7 +56,7 @@ public @interface DeltaField {
      * the direct access to fields code
      *
      */
-    String alias() default "+Value";
+    String alias() default "";
 
     /**
      * Define what kind of a field this is

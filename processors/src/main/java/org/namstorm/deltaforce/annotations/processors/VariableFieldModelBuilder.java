@@ -124,7 +124,7 @@ public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass>
         fieldModel.accessible = !element.getModifiers().contains(Modifier.PRIVATE);
 
         fieldModel.name = element.getSimpleName().toString();
-        fieldModel.alias = DFUtil.compileAlias(fieldModel.name, null);
+        fieldModel.alias = DFUtil.compileAlias(fieldModel.name, "");
         fieldModel.type = element.asType().toString();
 
         onAnnotation(DeltaField.class, a -> fieldModel.alias = DFUtil.compileAlias(fieldModel.name, a.alias()) );
