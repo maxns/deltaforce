@@ -13,14 +13,8 @@ import java.util.List;
  * Manages ledger state
  * Knows how to talk to builders and get their deltas
  */
-public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
+public abstract class AbstractDeltaLedger<T extends LedgerSchema> extends AbstractDeltaLedgerBase {
 
-    enum Status {
-        Open,
-        Closed
-    }
-
-    private Status status = Status.Closed;
     protected T schema;
 
     protected T schema() {
@@ -41,52 +35,10 @@ public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
     protected abstract T initSchema();
 
 
-    public void open() {
-        _assertClosed();
-
-        setStatus(Status.Open);
-        startEdit();
-    }
-
-    private void _assertClosed() {
-        if (status != Status.Closed) {
-            throw new IllegalStateException("Ledger is already open");
-        }
-    }
-
-    public void commit() {
-        _assertOpen("Cannot commit if not open");
-
-        commitEdit();
-        setStatus(Status.Closed);
-    }
-
-    protected void _assertOpen(String s) {
-        if (status != Status.Open) {
-            throw new IllegalStateException(s);
-        }
-    }
-
-    public void cancel() {
-        _assertOpen("Cannot cancel if not open");
-
-        cancelEdit();
-        setStatus(Status.Closed);
-    }
-
-    public void setStatus(Status status) {
-        this.status = status;
-    }
-
-    /**
-     * Override to start editing
-     */
-    protected abstract void startEdit();
-
-
     /**
      * Cycles through the fields and calls commitField
      */
+    @Override
     protected void commitEdit() {
         schema.fields().forEach(f -> {
 
@@ -128,11 +80,6 @@ public abstract class AbstractDeltaLedger<T extends LedgerSchema> {
      * @param delta
      */
     protected abstract void onDelta(LedgerField f, Delta delta);
-
-    /**
-     * Override to provide edit cancle logic
-     */
-    protected abstract void cancelEdit();
 
 
 }

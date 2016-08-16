@@ -1,5 +1,7 @@
 package org.namstorm.deltaforce.annotations;
 
+import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
+
 import java.lang.annotation.*;
 
 /**
@@ -29,5 +31,11 @@ public @interface DeltaBuilder {
      * @return
      */
     boolean ignoreInherited() default false;
+
+    /**
+     *
+     * @return
+     */
+    Class<? extends org.namstorm.deltaforce.core.DeltaBuilder> baseBuilder() default AbstractDeltaBuilder.class;
 
 }
