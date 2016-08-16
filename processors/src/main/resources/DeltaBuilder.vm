@@ -1,9 +1,7 @@
 #set ($class_name = "${model.deltaBuilderClassName}")
 package ${model.packageName};
 
-import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
-import org.namstorm.deltaforce.core.Delta;
-import org.namstorm.deltaforce.core.DeltaMap;
+import org.namstorm.deltaforce.core.*;
 import javax.annotation.Generated;
 
 /**
@@ -79,25 +77,18 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${util.StringUtils.capitalizeFirstLetter($field.name)}() #end, value); return this; }
 
     #elseif (${field.accessorType}=="buildable")
-    #set ($builderField = "${field.name}Builder")
-    private ${field.builderClassName} $builderField;
 
     public ${field.builderClassName} edit${field.alias}() {
+        // let's see if we have the delta setup already
+        BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
 
-        if(${builderField} == null) {
-
-            if(delta("${field.name})==null) {
-                ${field.type} curValue = #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end ;
-
-            }
-
-            addDelta(new Delta(op, "${field.name}", curValue, newValue)); //TODO: finish
-
-            ${builderField} = new ${field.builderClassName}(curValue);
+        // if not, set this up
+        if(bd == null) {
+            bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, create(), new ${field.builderClassName}() );
+            addDelta(bd);
         }
 
-
-        return ${builderField}.from( (${field.type}) delta("${field.name}").getOldValue() );
+        return (${field.builderClassName}) bd.getBuilder();
     }
     #end
 

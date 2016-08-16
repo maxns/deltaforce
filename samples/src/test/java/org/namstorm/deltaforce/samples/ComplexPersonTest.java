@@ -108,7 +108,11 @@ public class ComplexPersonTest extends TestCase {
 
         ComplexPerson testPerson = builder.build();
 
-        assertEquals("brother", "Alex", testPerson.brother.getFirstName());
+        assertNotNull("brother", testPerson.brother);
+        assertNotNull("privatePerson", testPerson.getPrivatePerson());
+        assertNotNull("nonBuildingBrother", testPerson.getNonBuildingBrother());
+
+        assertEquals("Brother's Name", "Alex", testPerson.brother.getFirstName());
         assertEquals("privatePerson", "Mickey", testPerson.getPrivatePerson().getFirstName());
         assertEquals("nobBuildingBrother", "Alex", testPerson.getNonBuildingBrother().getFirstName());
         assertNotSame("brother and non-building brother", testPerson.brother, testPerson.getNonBuildingBrother());

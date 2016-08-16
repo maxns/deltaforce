@@ -3,6 +3,7 @@ package org.namstorm.deltaforce.annotations.processors;
 import org.namstorm.deltaforce.core.Buildable;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.type.DeclaredType;
 
 /**
  * Created by maxnam-storm on 15/8/2016.
@@ -21,7 +22,7 @@ public class BuildableFieldModelBuilder extends VariableFieldModelBuilder<Builda
         res = applyCommon(res);
 
         res.setBuilderClassName(
-                element.asType().toString() + "Builder"
+                ((DeclaredType)element.asType()).asElement().getSimpleName().toString() + "Builder"
         );
 
         return res;

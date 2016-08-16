@@ -2,6 +2,8 @@ package org.namstorm.deltaforce.core;
 
 /**
  * Created by maxnam-storm on 9/8/2016.
+ *
+ * T is the underlying object this thing knows how to build
  */
 public interface DeltaBuilder<T extends Object> {
 
@@ -36,4 +38,12 @@ public interface DeltaBuilder<T extends Object> {
      * @return
      */
     T create();
+
+
+    /**
+     * Starting point for detlas
+     *
+     * @return
+     */
+    DeltaBuilder<T> from(T from);
 }

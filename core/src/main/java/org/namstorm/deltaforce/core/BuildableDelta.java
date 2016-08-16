@@ -3,9 +3,9 @@ package org.namstorm.deltaforce.core;
 /**
  * Created by maxnamstorm on 16/8/2016.
  */
-public class BuilderDelta<T> extends Delta<T> {
+public class BuildableDelta<T> extends Delta<T> {
 
-    public BuilderDelta(OP op, String fieldName, T oldValue, T newValue, DeltaBuilder<T> builder) {
+    public BuildableDelta(OP op, String fieldName, T oldValue, T newValue, DeltaBuilder<T> builder) {
         super(op, fieldName, oldValue, newValue);
         this.builder = builder;
     }
@@ -16,4 +16,8 @@ public class BuilderDelta<T> extends Delta<T> {
 
     private DeltaBuilder<T> builder;
 
+    @Override
+    public T applyTo(T to) {
+        return builder.apply(to==null?newValue:to);
+    }
 }

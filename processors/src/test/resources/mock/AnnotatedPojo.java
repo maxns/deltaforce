@@ -13,6 +13,9 @@ import java.util.List;
  */
 @DeltaBuilder
 public class AnnotatedPojo {
+
+    public AnnotatedPojo() {super();}
+
     public int getIntValue() {
         return intValue;
     }
