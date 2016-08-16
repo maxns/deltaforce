@@ -24,6 +24,9 @@ public class BuildableFieldModelBuilder extends VariableFieldModelBuilder<Builda
         res.setBuilderClassName(
                 ((DeclaredType)element.asType()).asElement().getSimpleName().toString() + "Builder"
         );
+        res.setBuilderPackage(
+                ((DeclaredType)element.asType()).asElement().getEnclosingElement().toString()
+        );
 
         return res;
     }

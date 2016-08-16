@@ -18,7 +18,7 @@ package org.namstorm.deltaforce.ledgers;
  *      a ledger reader - to read ledger entries and apply them to recreate objects upto any point
  *
  * How:
- *      You create a ledger schema, by creating a class with fields that correspond to related objects
+ *      You create a ledger openEntry, by creating a class with fields that correspond to related objects
  *          Note:
  *              if you haven't already annotated classes with @DeltaBuilder of their own, then you can do it here,
  *              of'course this means you don't have as much control

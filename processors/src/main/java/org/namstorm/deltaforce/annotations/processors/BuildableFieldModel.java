@@ -6,6 +6,12 @@ package org.namstorm.deltaforce.annotations.processors;
 public class BuildableFieldModel extends VariableFieldModel {
     public static String TYPE_FIELD = "buildable";
 
+    public String getBuilderPackage() {
+        return builderPackage;
+    }
+
+    private String builderPackage;
+
     @Override
     public String getAccessorType() {
         return TYPE_FIELD;
@@ -21,4 +27,10 @@ public class BuildableFieldModel extends VariableFieldModel {
 
     private String builderClassName;
 
+    public void setBuilderPackage(String builderPackage) {
+        this.builderPackage = builderPackage;
+    }
+    public String getBuilderFullClassName() {
+        return getBuilderPackage()+"."+getBuilderClassName();
+    }
 }

@@ -78,17 +78,17 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     #elseif (${field.accessorType}=="buildable")
 
-    public ${field.builderClassName} edit${field.alias}() {
+    public ${field.builderFullClassName} edit${field.alias}() {
         // let's see if we have the delta setup already
         BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
 
         // if not, set this up
         if(bd == null) {
-            bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, create(), new ${field.builderClassName}() );
+            bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, new ${field.type}(), new ${field.builderFullClassName}() );
             addDelta(bd);
         }
 
-        return (${field.builderClassName}) bd.getBuilder();
+        return (${field.builderFullClassName}) bd.getBuilder();
     }
     #end
 

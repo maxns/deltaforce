@@ -1,9 +1,11 @@
 package org.namstorm.deltaforce.ledgers;
 
+import org.namstorm.deltaforce.core.Delta;
+
 /**
  * Created by maxnam-storm on 16/8/2016.
  */
-public abstract class AbstractDeltaLedgerBase implements DeltaLedger {
+public abstract class AbstractDeltaLedgerBase<T extends DeltaLedgerEntry> implements DeltaLedger<T> {
     private Status status = Status.Closed;
 
     public AbstractDeltaLedgerBase() {
@@ -11,12 +13,17 @@ public abstract class AbstractDeltaLedgerBase implements DeltaLedger {
     }
 
     @Override
-    public void open() {
+    public T open() {
         _assertClosed();
-
         setStatus(Status.Open);
-        startEdit();
+        return (this.openEntry = createEntry());
     }
+
+    /**
+     * Override to create an entry
+     * @return
+     */
+    protected abstract T createEntry();
 
     private void _assertClosed() {
         if (status != Status.Closed) {
@@ -28,7 +35,7 @@ public abstract class AbstractDeltaLedgerBase implements DeltaLedger {
     public void commit() {
         _assertOpen("Cannot commit if not open");
 
-        commitEdit();
+        commitDeltas();
         setStatus(Status.Closed);
     }
 
@@ -41,8 +48,7 @@ public abstract class AbstractDeltaLedgerBase implements DeltaLedger {
     @Override
     public void cancel() {
         _assertOpen("Cannot cancel if not open");
-
-        cancelEdit();
+        openEntry = null;
         setStatus(Status.Closed);
     }
 
@@ -50,15 +56,16 @@ public abstract class AbstractDeltaLedgerBase implements DeltaLedger {
         this.status = status;
     }
 
-    /**
-     * Override to start editing
-     */
-    protected abstract void startEdit();
+    private T openEntry;
 
-    protected abstract void commitEdit();
+    protected T openEntry() {
+        return openEntry;
+    }
+
 
     /**
-     * Override to provide edit cancle logic
+     * Cycles through the fields and calls commitField
      */
-    protected abstract void cancelEdit();
+    protected abstract void commitDeltas();
+
 }

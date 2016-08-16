@@ -7,7 +7,7 @@ import org.namstorm.deltaforce.annotations.DeltaBuilder;
  *
  * This demonstrates how to create a buildable ledger
  */
-@DeltaBuilder(baseBuilder = )
+@DeltaBuilder()
 public class SimpleBuildableLedger {
 
 }
