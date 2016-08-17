@@ -18,6 +18,20 @@ public class BuildableDelta<T> extends Delta<T> {
 
     @Override
     public T applyTo(T to) {
-        return builder.from(to!=null?to:newValue).apply();
+        switch(getOp()) {
+            case ADD:
+            case UPDATE:
+                return to!=null
+                        ?builder.from(to).apply()
+                        :builder.apply();
+
+            case REMOVE:
+                return null;
+            case NOOP:
+                return getOldValue();
+
+
+        }
+        throw new UnsupportedOperationException("Unknown OP:" + getOp());
     }
 }

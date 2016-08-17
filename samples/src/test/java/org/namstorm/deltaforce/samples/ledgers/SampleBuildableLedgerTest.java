@@ -41,7 +41,7 @@ public class SampleBuildableLedgerTest extends TestCase{
 
         entry = ledger.open();
 
-        ledger.edit().editAuthor().setFirstName("mocky").setLastName("mock");
+        ledger.edit().createAuthor().setFirstName("mocky").setLastName("mock");
 
         ledger.commit();
 
@@ -60,16 +60,55 @@ public class SampleBuildableLedgerTest extends TestCase{
     }
 
     @Test
-    public void testFrom() {
+    public void testSets() {
 
         entry = ledger.open();
 
-        ledger.edit().editAuthor().from(complexPerson);
+        ledger.edit().setAuthor(complexPerson);
 
         ledger.commit();
 
         assertEquals("from person was set correctly", complexPerson, entry.getAuthor());
 
+    }
+
+
+    @Test
+    public void testCreate() {
+
+        entry = ledger.open();
+
+        ledger.edit().setAuthor(complexPerson);
+        ledger.edit().createAuthor().setFirstName("woohoo");
+
+        ledger.commit();
+
+        assertNotEquals("new person is new", complexPerson, entry.getAuthor());
+        assertEquals("new person is update", "woohoo", entry.getAuthor().getFirstName());
+    }
+
+    @Test
+    public void testCreateAndDelete() {
+
+        entry = ledger.open();
+
+        ledger.edit().setAuthor(complexPerson);
+
+        ledger.commit();
+
+        assertEquals("author set correctly", complexPerson, entry.getAuthor());
+
+        entry = ledger.open();
+;
+
+        assertNotEquals("author not yet set correctly", complexPerson, entry.getAuthor());
+
+
+        ledger.edit().deleteAuthor();
+
+        ledger.commit();
+
+        assertEquals("author deleted correctly", null, entry.getAuthor());
 
     }
 

@@ -102,9 +102,9 @@ public class ComplexPersonTest extends TestCase {
     public void testBuildable() throws Exception {
         org.namstorm.deltaforce.samples.ComplexPersonBuilder builder = new org.namstorm.deltaforce.samples.ComplexPersonBuilder();
 
-        builder.editBrother().setFirstName("Alex").setAge(44);
-        builder.editPrivatePerson().setFirstName("Mickey").setAge(50);
-        builder.setNonBuildingBrother(builder.editBrother().build());
+        builder.createBrother().setFirstName("Alex").setAge(44);
+        builder.createPrivatePerson().setFirstName("Mickey").setAge(50);
+        builder.setNonBuildingBrother(builder.createBrother().build());
 
         ComplexPerson testPerson = builder.build();
 

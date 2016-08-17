@@ -165,7 +165,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
 
     @Override
     public DeltaBuilder op(Delta.OP op) {
-        deltaMap().op = op;
+        deltaMap().setOp(op);
         return this;
     }
 

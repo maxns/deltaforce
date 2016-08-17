@@ -81,11 +81,13 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     #elseif (${field.accessorType}=="buildable")
 
     /** deletes the object (ie marks the delta to delete it) */
-    public $class_name delete${field.alias}() { edit${field.alias}(null); return this; }
-    public ${field.builderFullClassName} edit${field.alias}() { return edit${field.alias}( ${field.builderFullClassName}.create${field.className}() ); }
+    public $class_name delete${field.alias}() { set${field.alias}(null); return this; }
+    public ${field.builderFullClassName} create${field.alias}() { return set${field.alias}( ${field.builderFullClassName}.create${field.className}() ); }
+    public ${field.builderFullClassName} edit${field.alias}() { return set${field.alias}( #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end ); }
+
 
     /** edits the value using a builder */
-    protected ${field.builderFullClassName} edit${field.alias}(${field.type} newValue) {
+    public ${field.builderFullClassName} set${field.alias}(${field.type} newValue) {
         // let's see if we have the delta setup already
         BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
 
@@ -93,6 +95,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
         if(bd == null) {
             bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, newValue, new ${field.builderFullClassName}() );
             addDelta(bd);
+        }else {
+            bd.setOp(compare(bd.getOldValue(), newValue));
+            bd.setNewValue(newValue);
         }
 
         return (${field.builderFullClassName}) bd.getBuilder();
@@ -136,9 +141,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
                 #end
             #elseif (${field.accessorType}=="buildable")
                 #if( ${field.accessible} )
-                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue());
                 #else
-                to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.StringUtils.capitalizeFirstLetter($field.name)}()) );
+                to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue()) );
                 #end
             #end
             }

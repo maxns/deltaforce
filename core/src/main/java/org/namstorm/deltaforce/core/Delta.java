@@ -12,9 +12,24 @@ public class Delta<T> {
     }
 
     String fieldName;
-    OP op;
-    T newValue;
-    T oldValue;
+
+    public void setOp(OP op) {
+        this.op = op;
+    }
+
+    private OP op;
+
+    public void setNewValue(T newValue) {
+        this.newValue = newValue;
+    }
+
+    private T newValue;
+
+    public void setOldValue(T oldValue) {
+        this.oldValue = oldValue;
+    }
+
+    private T oldValue;
 
     public T getOldValue() {
         return oldValue;
