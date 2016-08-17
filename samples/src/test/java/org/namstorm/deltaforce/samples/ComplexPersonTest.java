@@ -53,7 +53,7 @@ public class ComplexPersonTest extends TestCase {
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .setMetaValue(VAL_META_NAME2, VAL_META_VALUE2)
-                .apply(testPerson);
+                .apply();
 
         assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
         assertEquals("New meta value setup", VAL_META_VALUE2, testPerson.getMetaValue(VAL_META_NAME2));
@@ -62,7 +62,7 @@ public class ComplexPersonTest extends TestCase {
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .setMetaValue(VAL_META_NAME2, null)
-                .apply(testPerson);
+                .apply();
 
         assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
         assertNull("Nulling of " + VAL_META_NAME2, testPerson.getMetaValue(VAL_META_NAME2));
@@ -86,7 +86,7 @@ public class ComplexPersonTest extends TestCase {
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .removeNickName(VAL_NICKNAME1)
-                .apply(testPerson);
+                .apply();
 
         // removed?
         assertFalse(VAL_NICKNAME1 + " should not survive", testPerson.getNickNames().contains(VAL_NICKNAME1));

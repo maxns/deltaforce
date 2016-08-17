@@ -18,6 +18,6 @@ public class BuildableDelta<T> extends Delta<T> {
 
     @Override
     public T applyTo(T to) {
-        return builder.apply(to==null?newValue:to);
+        return builder.from(to!=null?to:newValue).apply();
     }
 }

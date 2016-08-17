@@ -36,14 +36,18 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
 
     /**
      * All deltas from now on will be vs this object
+     * This also means that when you execute update() it will update this object and return
      *
      * @param from
      * @return
      */
-    public AbstractDeltaBuilder<T> from(T from) {
+    public DeltaBuilder<T> from(T from) {
         this.from = from;
         return this;
     }
+
+
+
 
     protected T _from() {
         return from == null? (from=create()):from;
@@ -156,7 +160,7 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      */
     @Override
     public T build() {
-        return apply(create());
+        return from(create()).apply();
     }
 
     @Override

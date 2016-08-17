@@ -53,13 +53,15 @@ public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass>
             printMessage(Kind.NOTE, "boxing:" + typeMirror.getKind().name());
 
             field.boxedType = autobox(typeMirror).getName();
+            field.className = autobox(typeMirror).getSimpleName();
 
         } else {
             field.boxedType = field.type;
-
-            field.primitive = true;
+            field.className = (typeMirror instanceof DeclaredType)?((DeclaredType)typeMirror).asElement().getSimpleName().toString():typeMirror.toString();
+            field.primitive = false;
 
         }
+
         return field;
 
     }
@@ -126,6 +128,8 @@ public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass>
         fieldModel.name = element.getSimpleName().toString();
         fieldModel.alias = DFUtil.compileAlias(fieldModel.name, "");
         fieldModel.type = element.asType().toString();
+
+        box(fieldModel, element.asType());
 
         onAnnotation(DeltaField.class, a -> fieldModel.alias = DFUtil.compileAlias(fieldModel.name, a.alias()) );
 

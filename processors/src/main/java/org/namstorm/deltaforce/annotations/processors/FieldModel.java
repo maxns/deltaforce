@@ -12,4 +12,5 @@ public interface FieldModel extends ElementModel<VariableElement>{
 
     String getAlias();
 
+    String getClassName();
 }

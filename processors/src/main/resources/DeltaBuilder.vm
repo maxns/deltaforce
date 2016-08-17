@@ -20,7 +20,9 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
     public $class_name($model.className from) {super(from);}
     public $class_name() {super(new ${model.className}());}
 
-    @Override public $model.className create() { return new ${model.className}(); }
+    public static ${model.className} create${model.className}() { return new ${model.className}(); }
+
+    @Override public ${model.className} create() { return create${model.className}(); }
 
     @Override public $class_name from($model.className from) { super.from(from); return this; }
     @Override public $class_name op(Delta.OP op) { super.op(op); return this; }
@@ -78,13 +80,18 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
     #elseif (${field.accessorType}=="buildable")
 
-    public ${field.builderFullClassName} edit${field.alias}() {
+    /** deletes the object (ie marks the delta to delete it) */
+    public $class_name delete${field.alias}() { edit${field.alias}(null); return this; }
+    public ${field.builderFullClassName} edit${field.alias}() { return edit${field.alias}( ${field.builderFullClassName}.create${field.className}() ); }
+
+    /** edits the value using a builder */
+    protected ${field.builderFullClassName} edit${field.alias}(${field.type} newValue) {
         // let's see if we have the delta setup already
         BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
 
         // if not, set this up
         if(bd == null) {
-            bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, new ${field.type}(), new ${field.builderFullClassName}() );
+            bd = createBuildableDelta("${field.name}", #if( ${field.accessible} ) _from().${field.name} #else _from().get${field.alias}() #end, newValue, new ${field.builderFullClassName}() );
             addDelta(bd);
         }
 
@@ -94,13 +101,18 @@ public class $class_name extends AbstractDeltaBuilder<${model.className}> {
 
 #end
 
+    public ${model.className} apply() {
+        return applyTo(_from());
+    }
+
+
     /**
     * apply deltas
     * @Override
     * @param to ${model.className} to apply deltas to
     * @return ${model.className} to object with deltas applies
     */
-    public ${model.className} apply(${model.className} to) {
+    public ${model.className} applyTo(${model.className} to) {
 
         #foreach($field in $fields)
             #set ($alias = "${field.alias}")

@@ -18,6 +18,8 @@ public class VariableFieldModel implements FieldModel {
     String type;
     String boxedType;
 
+    String className;
+
     boolean accessible;
     boolean primitive;
 
@@ -43,6 +45,11 @@ public class VariableFieldModel implements FieldModel {
 
     @Override
     public String getAlias() { return alias; }
+
+    @Override
+    public String getClassName() {
+        return className;
+    }
 
     @Override
     public String toString() {

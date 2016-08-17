@@ -251,6 +251,7 @@ public class DeltaBuilderProcessor
         JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
                 model.getDeltaBuilderClassName());
 
+
         printNote("creating source file: " + jfo.toUri(), null);
 
         Writer writer = jfo.openWriter();

@@ -35,7 +35,7 @@ public abstract class AbstractBuildableDeltaLedger<T extends BuildableLedgerEntr
 
     @Override
     public void commitDeltas() {
-        ledgerEntryBuilder.apply(openEntry());
+        ledgerEntryBuilder.apply();
     }
 
     public DeltaBuilder<T> edit() {

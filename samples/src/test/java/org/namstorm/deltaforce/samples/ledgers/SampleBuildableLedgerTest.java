@@ -2,6 +2,8 @@ package org.namstorm.deltaforce.samples.ledgers;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.namstorm.deltaforce.samples.ComplexPerson;
+import org.namstorm.deltaforce.samples.ComplexPersonBuilder;
 import org.namstorm.deltaforce.samples.ledgers.model.SampleBuildableLedgerEntry;
 
 import static org.junit.Assert.*;
@@ -12,11 +14,32 @@ import static org.junit.Assert.assertEquals;
  */
 public class SampleBuildableLedgerTest extends TestCase{
 
+    SampleBuildableLedgerEntry entry;
+    SampleBuildableLedger ledger;
+
+    ComplexPerson complexPerson;
+
+    @Override
+    protected void setUp() throws Exception {
+        super.setUp();
+        ledger = new SampleBuildableLedger();
+        complexPerson = new ComplexPersonBuilder().setFirstName("Complex").setLastName("Person").setAge(42).build();
+
+    }
+
+    @Override
+    protected void tearDown() throws Exception {
+        super.tearDown();
+
+        ledger = null;
+
+
+    }
+
     @Test
     public void testBuildableCommit() {
-        SampleBuildableLedger ledger = new SampleBuildableLedger();
 
-        SampleBuildableLedgerEntry entry = ledger.open();
+        entry = ledger.open();
 
         ledger.edit().editAuthor().setFirstName("mocky").setLastName("mock");
 
@@ -34,8 +57,21 @@ public class SampleBuildableLedgerTest extends TestCase{
         ledger.commit();
 
         assertEquals("total must be 10", (double)10, newEntry.getTotal());
+    }
 
+    @Test
+    public void testFrom() {
+
+        entry = ledger.open();
+
+        ledger.edit().editAuthor().from(complexPerson);
+
+        ledger.commit();
+
+        assertEquals("from person was set correctly", complexPerson, entry.getAuthor());
 
 
     }
+
+
 }

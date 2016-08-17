@@ -13,21 +13,24 @@ public interface DeltaBuilder<T extends Object> {
     DeltaBuilder op(Delta.OP op);
 
     /**
-     *
      * Will visit deltas
      * @param visitor
      */
     void visitDeltas(DeltaVisitor visitor);
 
+    /**
+     * Builds a new version
+     * @return
+     */
     T build();
 
     /**
      * applies deltas to an object to
      *
-     * @param to object to which to apply this
-     * @return from
+     * applies to from object to which to apply this
+     * @return object that's been applied to
      */
-    T apply(T to);
+    T apply();
 
     /**
      * creates a new object
