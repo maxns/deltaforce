@@ -1,6 +1,6 @@
 package org.namstorm.deltaforce.samples.ledgers.model;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 import org.namstorm.deltaforce.core.CollectionWrapper;
 
@@ -10,7 +10,7 @@ import java.util.Collection;
 /**
  * Created by maxnamstorm on 14/8/2016.
  */
-@DeltaBuilder
+@DeltaForceBuilder
 public class Orders extends CollectionWrapper<Order>{
 
     @DeltaField(alias="-s")

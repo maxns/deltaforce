@@ -1,6 +1,6 @@
 package org.namstorm.deltaforce.samples.ledgers.model;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 
 import java.util.Date;
 import java.util.UUID;
@@ -8,7 +8,7 @@ import java.util.UUID;
 /**
  * Created by maxnamstorm on 9/8/2016.
  */
-@DeltaBuilder
+@DeltaForceBuilder
 public class Order {
     public String getDescription() {
         return description;

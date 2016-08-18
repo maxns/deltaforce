@@ -1,15 +1,33 @@
 package org.namstorm.deltaforce.samples;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.core.Buildable;
 
 import java.util.*;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
  */
-@DeltaBuilder
-public class ComplexPerson extends Person{
+@DeltaForceBuilder(implement = {"ComplexPerson.Builder"})
+public class ComplexPerson extends Person implements Buildable<ComplexPerson, ComplexPerson.Builder>{
+    interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<ComplexPerson>{
+
+    }
+
+    @DeltaField(ignore = true)
+    private transient Builder builder;
+
+    @Override
+    public Builder getBuilder() {
+        return builder;
+    }
+
+    @Override
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
     public int getIntValue() {
         return intValue;
     }

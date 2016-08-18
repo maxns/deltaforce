@@ -43,6 +43,8 @@ public interface DeltaBuilder<T extends Object> {
     T create();
 
 
+    T from();
+
     /**
      * Starting point for detlas
      *

@@ -5,6 +5,10 @@ package org.namstorm.deltaforce.core;
  *
  * Just a helper interface that denotes that this thing is buildable
  *
+ *
+ *
  */
-public interface Buildable {
+public interface Buildable<T, Builder extends DeltaBuilder<T>> {
+    Builder getBuilder();
+    void setBuilder(Builder builder);
 }

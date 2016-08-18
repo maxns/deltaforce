@@ -1,6 +1,6 @@
 package mock;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 
 import java.util.Collection;
@@ -11,8 +11,25 @@ import java.util.List;
 /**
  * Created by maxnam-storm on 11/8/2016.
  */
-@DeltaBuilder
-public class AnnotatedPojo {
+@DeltaForceBuilder(implement={"AnnotatedPojo.Builder"})
+public class AnnotatedPojo implements org.namstorm.deltaforce.core.Buildable<AnnotatedPojo,AnnotatedPojo.Builder> {
+    interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<AnnotatedPojo>{
+
+    }
+
+    @DeltaField(ignore = true)
+    private transient Builder builder;
+
+    @Override
+    public Builder getBuilder() {
+        return builder;
+    }
+
+    @Override
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
 
     public AnnotatedPojo() {super();}
 

@@ -5,7 +5,7 @@ import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
 import java.lang.annotation.*;
 
 /**
- * The DeltaBuilder annotation type, marks a class to be enabled for DeltaBuilder
+ * The DeltaForceBuilder annotation type, marks a class to be enabled for DeltaForceBuilder
  *
  * @author maxns
  * @version 1.0
@@ -17,25 +17,31 @@ import java.lang.annotation.*;
         ElementType.METHOD
 })
 @Retention(RetentionPolicy.SOURCE)
-public @interface DeltaBuilder {
+public @interface DeltaForceBuilder {
 
 
     /**
      * Default 'Builder' - but can be set to anything as suffix of the builders alias
-     * @return
+     *
      */
     String builderNameSuffix() default "Builder";
 
     /**
      * If set to true, will NOT go into superclass and get fields from it
-     * @return
+     *
      */
     boolean ignoreInherited() default false;
 
     /**
+     * sets up a custom base for the builder
      *
-     * @return
      */
-    Class<? extends org.namstorm.deltaforce.core.DeltaBuilder> baseBuilder() default AbstractDeltaBuilder.class;
+    String extend() default "org.namstorm.deltaforce.core.AbstractDeltaBuilder";
+
+    /**
+     * sets up interfaces to implement
+     *
+     */
+    String[] implement() default {};
 
 }

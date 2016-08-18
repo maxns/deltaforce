@@ -1,7 +1,5 @@
 package org.namstorm.deltaforce.ledgers;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
-
 import java.util.Set;
 
 /**

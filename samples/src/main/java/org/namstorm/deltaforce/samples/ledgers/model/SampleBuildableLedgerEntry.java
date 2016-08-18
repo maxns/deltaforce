@@ -1,19 +1,35 @@
 package org.namstorm.deltaforce.samples.ledgers.model;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.core.DeltaBuilder;
 import org.namstorm.deltaforce.ledgers.buildable.BuildableLedgerEntry;
 import org.namstorm.deltaforce.samples.ComplexPerson;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Date;
 
 /**
  * Created by maxnamstorm on 16/8/2016.
  */
-@DeltaBuilder
-public class SampleBuildableLedgerEntry implements BuildableLedgerEntry{
+@DeltaForceBuilder(implement={"SampleBuildableLedgerEntry.Builder"})
+public class SampleBuildableLedgerEntry implements BuildableLedgerEntry<SampleBuildableLedgerEntry,SampleBuildableLedgerEntry.Builder>{
+    @DeltaField(ignore = true) private Builder builder;
+    @Override
+    public Builder getBuilder() {
+        return builder;
+    }
+
+    @Override
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
+
+    public interface Builder extends DeltaBuilder<SampleBuildableLedgerEntry> {
+        Builder setAuthor(ComplexPerson author);
+
+    }
 
     ComplexPerson author;
     Date timeStamp = new Date();

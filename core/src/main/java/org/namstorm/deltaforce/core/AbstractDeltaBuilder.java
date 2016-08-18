@@ -42,15 +42,28 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      * @return
      */
     public DeltaBuilder<T> from(T from) {
-        this.from = from;
+        this.from = initBuilder(from);
         return this;
     }
 
 
 
+    /**
+     * bit of a hack for now
+     * @param buildable
+     * @return
+     */
+    protected T initBuilder(T buildable) {
+        if(buildable instanceof Buildable) {
+            ((Buildable) buildable).setBuilder(this);
+        }
+        return buildable;
+    }
 
-    protected T _from() {
-        return from == null? (from=create()):from;
+
+
+    public T from() {
+        return from;
     }
 
     /**
@@ -59,6 +72,12 @@ public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBui
      */
     protected void addDelta(Delta<?> delta) {
         deltaMap.addDelta(delta.getFieldName(), delta);
+    }
+
+    protected <TBuildable extends Buildable> void addDelta(BuildableDelta<TBuildable> delta, DeltaBuilder<TBuildable> builder) {
+        addDelta(delta);
+
+        delta.setBuilder(builder);
     }
 
     /**

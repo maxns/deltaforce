@@ -1,13 +1,12 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.apache.commons.lang.StringUtils;
 import org.apache.velocity.Template;
 import org.apache.velocity.VelocityContext;
 import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.tools.generic.DisplayTool;
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
@@ -26,8 +25,8 @@ import java.net.URL;
 import java.util.*;
 
 /**
- * Annotation processors for DeltaBuilder annotation type. It generates a full featured
- * DeltaBuilder type with the help of an Apache Velocity template.
+ * Annotation processors for DeltaForceBuilder annotation type. It generates a full featured
+ * DeltaForceBuilder type with the help of an Apache Velocity template.
  *
  * @version 1.0
  */
@@ -37,7 +36,7 @@ public class DeltaBuilderProcessor
     /**
      * keeping it plain, avoiding Android issues
      */
-    static HashSet<String> SUPPORTED_TYPES = new HashSet<>(Arrays.asList("org.namstorm.deltaforce.annotations.DeltaBuilder"));
+    static HashSet<String> SUPPORTED_TYPES = new HashSet<>(Arrays.asList("org.namstorm.deltaforce.annotations.DeltaForceBuilder"));
     private Properties properties;
     private VelocityEngine velocityEngine;
 
@@ -78,8 +77,8 @@ public class DeltaBuilderProcessor
 
 
     /**
-     * Reads the DeltaBuilder information and writes a full featured
-     * DeltaBuilder type with the help of an Apache Velocity template.
+     * Reads the DeltaForceBuilder information and writes a full featured
+     * DeltaForceBuilder type with the help of an Apache Velocity template.
      *
      * @param annotations set of annotations found
      * @param roundEnv    the environment for this processors round
@@ -97,35 +96,11 @@ public class DeltaBuilderProcessor
 
         try {
             DeltaBuilderTypeModel model = null;
-            for (Element elem : roundEnv.getElementsAnnotatedWith(DeltaBuilder.class)) {
+            for (Element elem : roundEnv.getElementsAnnotatedWith(DeltaForceBuilder.class)) {
                 ce = elem;
 
                 if (elem.getKind() == ElementKind.CLASS) {
-
-                    model = new DeltaBuilderTypeModel();
-
-
-
-                    Map<String, FieldModel> fields = new HashMap<>();
-                    modelMap.put(model, fields);
-
-                    TypeElement classElement = (TypeElement) elem;
-                    PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
-
-                    DeltaBuilder annotation = classElement.getAnnotation(DeltaBuilder.class);
-
-                    model.packageName = packageElement.getQualifiedName().toString();
-                    model.className = classElement.getSimpleName().toString();
-                    model.qualifiedName = classElement.getQualifiedName().toString();
-                    model.deltaBuilderClassName = model.className + annotation.builderNameSuffix();
-
-                    processingEnv.getMessager().printMessage(
-                            Diagnostic.Kind.NOTE,
-                            "annotating class: " + model.qualifiedName, elem);
-
-                    collectFields(classElement, fields, !annotation.ignoreInherited());
-
-
+                    createBuilderModel(modelMap, elem);
                 }
             }
 
@@ -156,6 +131,42 @@ public class DeltaBuilderProcessor
         }
 
         return true;
+    }
+
+    private void createBuilderModel(HashMap<DeltaBuilderTypeModel, Map<String, FieldModel>> modelMap, Element elem) {
+        DeltaBuilderTypeModel model;
+        model = new DeltaBuilderTypeModel();
+
+
+        Map<String, FieldModel> fields = new HashMap<>();
+        modelMap.put(model, fields);
+
+        TypeElement classElement = (TypeElement) elem;
+        PackageElement packageElement = (PackageElement) classElement.getEnclosingElement();
+
+        DeltaForceBuilder annotation = classElement.getAnnotation(DeltaForceBuilder.class);
+
+        model.packageName = packageElement.getQualifiedName().toString();
+        model.className = classElement.getSimpleName().toString();
+        model.qualifiedName = classElement.getQualifiedName().toString();
+        model.deltaBuilderClassName = model.className + annotation.builderNameSuffix();
+        model.extendClassName = annotation.extend() + "<" + model.className + ">";
+        model.implementsInterfaces = "";
+
+        for (int i = 0; i < annotation.implement().length; i++) {
+            model.implementsInterfaces = model.implementsInterfaces + (i>0?",":"") +
+                    annotation.implement()[i];
+        }
+        model.implementsInterfaces = model.implementsInterfaces.replace("/<@>/g","<" + model.className + ">");
+
+        // see if this is a special buildable guy
+
+
+        processingEnv.getMessager().printMessage(
+                Diagnostic.Kind.NOTE,
+                "annotating class: " + model.qualifiedName, elem);
+
+        collectFields(classElement, fields, !annotation.ignoreInherited());
     }
 
     private void collectFields(TypeElement elem, Map<String, FieldModel> fields, boolean recurse) {

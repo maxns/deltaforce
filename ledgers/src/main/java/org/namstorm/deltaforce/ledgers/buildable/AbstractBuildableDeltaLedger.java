@@ -30,7 +30,8 @@ public abstract class AbstractBuildableDeltaLedger<T extends BuildableLedgerEntr
 
     @Override
     protected T createEntry() {
-        return ledgerEntryBuilder.create();
+        ledgerEntryBuilder.from(ledgerEntryBuilder.create());
+        return ledgerEntryBuilder.from();
     }
 
     @Override

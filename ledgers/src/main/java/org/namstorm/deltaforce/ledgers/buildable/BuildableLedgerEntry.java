@@ -1,6 +1,7 @@
 package org.namstorm.deltaforce.ledgers.buildable;
 
 import org.namstorm.deltaforce.core.Buildable;
+import org.namstorm.deltaforce.core.Delta;
 import org.namstorm.deltaforce.core.DeltaBuilder;
 import org.namstorm.deltaforce.ledgers.DeltaLedgerEntry;
 
@@ -10,7 +11,9 @@ import org.namstorm.deltaforce.ledgers.DeltaLedgerEntry;
  * Derive from this interface to create a ledger entry
  *
  */
-public interface BuildableLedgerEntry extends DeltaLedgerEntry, Buildable {
+public interface BuildableLedgerEntry
+        <T extends BuildableLedgerEntry, B extends DeltaBuilder<T>>
+        extends DeltaLedgerEntry, Buildable<T, B> {
 
 
 }

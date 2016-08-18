@@ -1,6 +1,6 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
 import org.namstorm.deltaforce.annotations.processors.util.DFProcessorUtil;
 
@@ -107,7 +107,7 @@ public class FieldModelBuilderFactory {
     /**
      * Attempts to match the right builder by:
      *  1. reading what the annotation say in its' type argument in its' @DeltaField field annotation
-     *  2. if the class of the field itself is annotated with @DeltaBuilder
+     *  2. if the class of the field itself is annotated with @DeltaForceBuilder
      *  3. finally match with something in the builder map
      *
      * @See autoMatchBuilder
@@ -201,7 +201,7 @@ public class FieldModelBuilderFactory {
         if(builderMap.containsKey(fieldClass)) {
             res = builderMap.get(fieldClass);
         }else {
-            if(DFProcessorUtil.onAnnotations(typeElem, DeltaBuilder.class, Boolean.FALSE).select(a -> true)) {
+            if(DFProcessorUtil.onAnnotations(typeElem, DeltaForceBuilder.class, Boolean.FALSE).select(a -> true)) {
                 res = BUILDABLE_FIELD_MODEL_BUILDER_CLASS;
             }
 

@@ -21,6 +21,46 @@ public class DeltaBuilderTypeModel {
 
     String deltaBuilderQualifiedName;
 
+    String extendClassName;
+
+    String implementsInterfaces;
+
+    public void setPackageName(String packageName) {
+        this.packageName = packageName;
+    }
+
+    public void setClassName(String className) {
+        this.className = className;
+    }
+
+    public void setQualifiedName(String qualifiedName) {
+        this.qualifiedName = qualifiedName;
+    }
+
+    public void setDeltaBuilderClassName(String deltaBuilderClassName) {
+        this.deltaBuilderClassName = deltaBuilderClassName;
+    }
+
+    public void setDeltaBuilderQualifiedName(String deltaBuilderQualifiedName) {
+        this.deltaBuilderQualifiedName = deltaBuilderQualifiedName;
+    }
+
+    public String getExtendClassName() {
+        return extendClassName;
+    }
+
+    public void setExtendClassName(String extendClassName) {
+        this.extendClassName = extendClassName;
+    }
+
+    public String getImplementsInterfaces() {
+        return implementsInterfaces;
+    }
+
+    public void setImplementsInterfaces(String implementsInterfaces) {
+        this.implementsInterfaces = implementsInterfaces;
+    }
+
     /**
      * Default constructor.
      */

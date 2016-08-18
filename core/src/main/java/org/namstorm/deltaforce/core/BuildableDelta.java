@@ -13,8 +13,12 @@ public class BuildableDelta<T> extends Delta<T> {
     public DeltaBuilder<T> getBuilder() {
         return builder;
     }
+    public void setBuilder(DeltaBuilder<T> builder) {
+        this.builder = builder;
+    }
 
     private DeltaBuilder<T> builder;
+
 
     @Override
     public T applyTo(T to) {
