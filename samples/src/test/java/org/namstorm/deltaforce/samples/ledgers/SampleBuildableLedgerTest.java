@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.namstorm.deltaforce.samples.ComplexPerson;
 import org.namstorm.deltaforce.samples.ComplexPersonBuilder;
+import org.namstorm.deltaforce.samples.Person;
 import org.namstorm.deltaforce.samples.ledgers.model.SampleBuildableLedgerEntry;
 
 import static org.junit.Assert.*;
@@ -113,6 +114,28 @@ public class SampleBuildableLedgerTest extends TestCase{
         ledger.commit();
 
         assertEquals("author deleted correctly", null, entry.getAuthor());
+
+    }
+    @Test
+    public void testGetAccess() {
+        entry = ledger.open();
+
+        Person person = entry.getAuthor();
+
+        assertNull("person should be null", person);
+
+        ledger.edit().createAuthor().getAuthor().setFirstName("nice").setLastName("one");
+
+        assertEquals("pre-commit checks", "nice", ledger.edit().getAuthor().getFirstName());
+
+        ledger.commit();
+
+        person = entry.getAuthor();
+
+        assertNotNull("person should be set post commit", person);
+
+
+        assertEquals("post-commit checks", "one", person.getLastName());
 
     }
 

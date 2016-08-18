@@ -75,6 +75,12 @@ extends ${model.extendClassName}
 
         return this;
     }
+    /** returns either a value tht's already been set or if none provided, previous value */
+    public ${field.type} get$alias() {
+        return deltaMap().containsKey("${field.name}") ? (${field.type}) delta("${field.name}").getNewValue()
+                                                        : $from_value;
+    }
+
     #elseif( ${field.accessorType}=="map" )
         #set ($alias = "${field.alias}")
 
