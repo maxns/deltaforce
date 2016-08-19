@@ -146,6 +146,7 @@ extends ${model.extendClassName}
 
         #foreach($field in $fields)
             #set ($alias = "${field.alias}")
+            #set ($name_part = "${util.StringUtils.capitalizeFirstLetter($field.name)}")
 
             if(deltaMap().containsKey("${field.name}")){
             #if( ${field.accessorType} == "field" )
@@ -154,15 +155,13 @@ extends ${model.extendClassName}
                 #if( ${field.accessible} )
                 delta("${field.name}").applyTo(to.${field.name});
                 #else
-                for(${field.key.boxedType} key: map ) {
-                    to.set$alias(key, map.get(key));
-                }
+                to.set${name_part}( ($field.type) delta("${field.name}").applyTo( to.get${name_part}() ) );
                 #end
             #elseif (${field.accessorType}=="collection")
                 #if( ${field.accessible} )
                 to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
                 #else
-                to.set${util.StringUtils.capitalizeFirstLetter($field.name)}( (${field.type}) delta("${field.name}").applyTo(to.get${util.StringUtils.capitalizeFirstLetter($field.name)}()) );
+                to.set$name_part( (${field.type}) delta("${field.name}").applyTo(to.get$name_part()) );
                 #end
             #elseif (${field.accessorType}=="buildable")
                 #if( ${field.accessible} )

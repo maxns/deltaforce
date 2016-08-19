@@ -127,6 +127,24 @@ public class AnnotatedPojo implements org.namstorm.deltaforce.core.Buildable<Ann
     @DeltaField(alias = "metaValue")
     HashMap<String,String> metaValues = new HashMap<>();
 
+    @DeltaField(alias = "PrefInt")
+    private HashMap<String,Integer> preferences = new HashMap<>();
+
+    public HashMap<String, Integer> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(HashMap<String, Integer> preferences) {
+        this.preferences = preferences;
+    }
+
+    public Integer getPrefInt(String key) {
+        return preferences.get(key);
+    }
+    public Integer setPrefInt(String key, int val) {
+        return preferences.put(key, val);
+    }
+
 
 
 

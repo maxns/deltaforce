@@ -87,6 +87,18 @@ public class ComplexPerson extends Person implements Buildable<ComplexPerson, Co
     @DeltaField(alias = "metaValue")
     HashMap<String,String> metaValues = new HashMap<>();
 
+    public HashMap<String, String> getPreferences() {
+        return preferences;
+    }
+
+    public void setPreferences(HashMap<String, String> preferences) {
+        this.preferences = preferences;
+    }
+
+    @DeltaField(alias = "Pereference")
+    private HashMap<String,String> preferences = new HashMap<>();
+
+
     Person publicPerson;
 
     public Person getPrivatePerson() {
