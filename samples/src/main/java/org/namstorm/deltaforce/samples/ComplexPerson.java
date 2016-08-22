@@ -1,7 +1,7 @@
 package org.namstorm.deltaforce.samples;
 
-import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.core.Buildable;
 
 import java.util.*;
@@ -11,6 +11,7 @@ import java.util.*;
  */
 @DeltaForceBuilder(implement = {"ComplexPerson.Builder"})
 public class ComplexPerson extends Person implements Buildable<ComplexPerson, ComplexPerson.Builder>{
+
     interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<ComplexPerson>{
 
     }
@@ -95,8 +96,12 @@ public class ComplexPerson extends Person implements Buildable<ComplexPerson, Co
         this.preferences = preferences;
     }
 
-    @DeltaField(alias = "Pereference")
+    @DeltaField(alias = "Preference")
     private HashMap<String,String> preferences = new HashMap<>();
+
+    public String getPreference(String key) {
+        return preferences.get(key);
+    }
 
 
     Person publicPerson;
