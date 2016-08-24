@@ -1,9 +1,8 @@
 package org.namstorm.deltaforce.core;
 
-import org.namstorm.fluency.OnIntResult;
-
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Stack;
 
 /**
  * Created by maxnamstorm on 6/8/2016.
@@ -22,6 +21,7 @@ public class DeltaUtil {
                     toStack.push(to);
                     Map next = (Map) to.get(d.getFieldName());
 
+                    // if nothing in the stack, need to create something
                     if(next==null) {
                         next = new HashMap();
                         to.put(d.getFieldName(), next);
@@ -85,7 +85,7 @@ public class DeltaUtil {
      * @param deltaMap
      * @param visitor
      */
-    public static void visitDeltas(DeltaMap deltaMap, DeltaVisitor visitor) {
+    public static void visitDeltas(final DeltaMap deltaMap, final DeltaVisitor visitor) {
         deltaMap.map().values().forEach(o -> visitor.visit((Delta<?>) o));
 
     }

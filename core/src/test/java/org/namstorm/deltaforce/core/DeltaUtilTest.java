@@ -23,6 +23,8 @@ public class DeltaUtilTest extends TestCase {
     Map<String,Object> refSourceMap;
     Map<String,Object> refTargetMap;
     Map<String,Object> testMap;
+    Map<String,Object> testParentMap;
+
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -31,6 +33,7 @@ public class DeltaUtilTest extends TestCase {
         refTargetMap = new HashMap<>(refSourceMap);
 
         testMap = new HashMap<>();
+        testParentMap = new HashMap<>();
 
         deltaMap = new DeltaMap(Delta.OP.UPDATE, getName(), refSourceMap);
     }
@@ -66,6 +69,7 @@ public class DeltaUtilTest extends TestCase {
         String TEST_UPDATE_VALUE = "testValue123";
 
         deltaMap.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.UPDATE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
+
 
         DeltaUtil.applyMapDeltas(deltaMap, testMap);
 

@@ -18,8 +18,6 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
 
     @Override
     public void visit(Delta<?> delta) {
-
-
         if(delta instanceof DeltaMap) {
             visitMap((DeltaMap)delta);
         }else {
