@@ -1,14 +1,15 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.Element;
 import java.lang.annotation.Annotation;
 import java.util.function.Consumer;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 
 /**
  * Created by maxnamstorm on 10/8/2016.
  */
-public abstract class ModelBuilder<E extends Element, T extends ElementModel<E>> {
+public abstract class ModelBuilder<E extends Element> {
     protected E element;
     protected ProcessingEnvironment pe;
 
