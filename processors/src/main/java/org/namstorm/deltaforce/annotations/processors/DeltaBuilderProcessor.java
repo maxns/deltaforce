@@ -6,11 +6,13 @@ import org.apache.velocity.app.VelocityEngine;
 import org.apache.velocity.exception.ParseErrorException;
 import org.apache.velocity.exception.ResourceNotFoundException;
 import org.apache.velocity.tools.generic.DisplayTool;
-import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
-import javax.annotation.processing.*;
+import javax.annotation.processing.AbstractProcessor;
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.annotation.processing.RoundEnvironment;
 import javax.lang.model.SourceVersion;
 import javax.lang.model.element.*;
 import javax.lang.model.type.DeclaredType;
@@ -150,6 +152,7 @@ public class DeltaBuilderProcessor
         model.className = classElement.getSimpleName().toString();
         model.qualifiedName = classElement.getQualifiedName().toString();
         model.deltaBuilderClassName = model.className + annotation.builderNameSuffix();
+        model.deltaBuilderQualifiedName = model.packageName + "." + model.deltaBuilderClassName;
         model.extendClassName = annotation.extend() + "<" + model.className + ">";
         model.implementsInterfaces = "";
 
@@ -260,7 +263,7 @@ public class DeltaBuilderProcessor
         Template vt = velocityEngine.getTemplate("DeltaBuilder.vm");
 
         JavaFileObject jfo = processingEnv.getFiler().createSourceFile(
-                model.getDeltaBuilderClassName());
+                model.getDeltaBuilderQualifiedName());
 
 
         printNote("creating source file: " + jfo.toUri(), null);
