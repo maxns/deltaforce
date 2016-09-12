@@ -1,16 +1,17 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.namstorm.deltaforce.annotations.DeltaField;
-import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
+import java.lang.reflect.Array;
+import java.util.List;
+import java.util.function.Consumer;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Modifier;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
-import java.lang.reflect.Array;
-import java.util.List;
-import java.util.function.Consumer;
+
+import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
 import static javax.tools.Diagnostic.Kind;
 
@@ -19,7 +20,7 @@ import static javax.tools.Diagnostic.Kind;
  * <p>
  * Builds field models
  */
-public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement, M> {
+public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement> {
 
     public VariableFieldModelBuilder() {
         super();
