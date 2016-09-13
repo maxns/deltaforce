@@ -6,7 +6,7 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * Created by maxnamstorm on 4/8/2016.
  */
 public class VariableFieldModel implements FieldModel {
-    public static String TYPE_FIELD = "field";
+    public static final String TYPE_FIELD = "field";
 
     @Override
     public String getAccessorType() { return TYPE_FIELD; }

@@ -9,8 +9,8 @@ import org.namstorm.deltaforce.samples.ledgers.model.SampleBuildableLedgerEntryB
  * Created by maxnamstorm on 16/8/2016.
  */
 public class SampleBuildableLedger extends AbstractBuildableDeltaLedger<SampleBuildableLedgerEntry> {
-    private static Class BUILDER_CLASS;
-    {
+    private static Class<?> BUILDER_CLASS;
+    static {
         try {
             BUILDER_CLASS = Class.forName("org.namstorm.deltaforce.samples.ledgers.model.SampleBuildableLedgerEntryBuilder");
         } catch (ClassNotFoundException e) {

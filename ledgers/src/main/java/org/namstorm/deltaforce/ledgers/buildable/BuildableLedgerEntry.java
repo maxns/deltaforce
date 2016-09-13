@@ -1,7 +1,6 @@
 package org.namstorm.deltaforce.ledgers.buildable;
 
 import org.namstorm.deltaforce.core.Buildable;
-import org.namstorm.deltaforce.core.Delta;
 import org.namstorm.deltaforce.core.DeltaBuilder;
 import org.namstorm.deltaforce.ledgers.DeltaLedgerEntry;
 

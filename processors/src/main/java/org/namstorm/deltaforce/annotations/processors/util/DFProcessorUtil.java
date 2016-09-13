@@ -1,12 +1,10 @@
 package org.namstorm.deltaforce.annotations.processors.util;
 
-import org.namstorm.fluency.OnResult;
+import java.lang.annotation.Annotation;
 
 import javax.lang.model.element.Element;
-import java.lang.annotation.Annotation;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.function.Supplier;
+
+import org.namstorm.fluency.OnResult;
 
 /**
  * Created by maxnam-storm on 15/8/2016.
@@ -14,7 +12,7 @@ import java.util.function.Supplier;
 public class DFProcessorUtil {
     public static class OnAnnotationResult<T extends Annotation,R> extends OnResult<T[]> {
         public interface Selector<T, R> {
-            public R select(T from);
+            R select(T from);
         }
 
         R defaultValue;

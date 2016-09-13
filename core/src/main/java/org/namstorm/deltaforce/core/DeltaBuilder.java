@@ -5,7 +5,7 @@ package org.namstorm.deltaforce.core;
  *
  * T is the underlying object this thing knows how to build
  */
-public interface DeltaBuilder<T extends Object> {
+public interface DeltaBuilder<T> {
 
     /**
      * Sets the "root" op - ie what is happening to the root objects (not just its fields)

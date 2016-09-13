@@ -1,7 +1,5 @@
 package org.namstorm.deltaforce.ledgers;
 
-import org.namstorm.deltaforce.core.Delta;
-
 /**
  * Created by maxnam-storm on 16/8/2016.
  */

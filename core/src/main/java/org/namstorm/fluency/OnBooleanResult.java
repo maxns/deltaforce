@@ -20,13 +20,13 @@ public class OnBooleanResult extends OnResult<Boolean> {
     }
 
     public OnBooleanResult onTrue(ResultConsumer<Boolean> consumer) {
-        if (result == true) {
+        if (result) {
             consumer.accept(result);
         }
         return this;
     }
     public OnBooleanResult onFalse(ResultConsumer<Boolean> consumer) {
-        if(result == false) {
+        if(!result) {
             consumer.accept(result);
         }
         return this;

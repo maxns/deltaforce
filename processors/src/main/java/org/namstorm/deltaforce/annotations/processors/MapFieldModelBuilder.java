@@ -1,9 +1,9 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.type.DeclaredType;
 import java.util.HashMap;
 import java.util.Map;
+
+import javax.annotation.processing.ProcessingEnvironment;
 
 import static javax.tools.Diagnostic.Kind;
 
@@ -23,9 +23,6 @@ public class MapFieldModelBuilder extends VariableFieldModelBuilder<MapFieldMode
 
         MapFieldModel mapRes = new MapFieldModel();
         applyCommon(mapRes);
-
-        DeclaredType ty = (DeclaredType) element.asType();
-
 
         mapRes.key = new VariableFieldModel();
         mapRes.key.type = "Object";

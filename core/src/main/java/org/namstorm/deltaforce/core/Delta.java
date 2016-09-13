@@ -11,7 +11,7 @@ public class Delta<T> {
         NOOP
     }
 
-    String fieldName;
+    private final String fieldName;
 
     public void setOp(OP op) {
         this.op = op;

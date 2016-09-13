@@ -17,8 +17,6 @@ public class Person {
         OTHER
     }
 
-    ;
-
     public String getFirstName() {
         return firstName;
     }

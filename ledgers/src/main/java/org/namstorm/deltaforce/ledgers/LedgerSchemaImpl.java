@@ -1,8 +1,5 @@
 package org.namstorm.deltaforce.ledgers;
 
-import com.google.common.collect.ImmutableSet;
-import org.apache.commons.collections.SetUtils;
-
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
@@ -13,12 +10,12 @@ import java.util.Set;
 public class LedgerSchemaImpl<T extends LedgerField> implements LedgerSchema<T> {
 
 
-    private Set<T> fields;
-    private Set<T> fields_;
+    private final Set<T> fields;
+    private final Set<T> fields_;
 
     public LedgerSchemaImpl() {
         super();
-        fields = new HashSet<T>();
+        fields = new HashSet<>();
         fields_ = Collections.unmodifiableSet(fields);
     }
 

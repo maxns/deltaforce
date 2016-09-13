@@ -1,8 +1,10 @@
 package org.namstorm.deltaforce.annotations;
 
-import org.namstorm.deltaforce.core.AbstractDeltaBuilder;
-
-import java.lang.annotation.*;
+import java.lang.annotation.Documented;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Retention;
+import java.lang.annotation.RetentionPolicy;
+import java.lang.annotation.Target;
 
 /**
  * The DeltaForceBuilder annotation type, marks a class to be enabled for DeltaForceBuilder

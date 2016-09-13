@@ -9,7 +9,7 @@ import org.namstorm.deltaforce.ledgers.LedgerField;
  * Created by maxnam-storm on 16/8/2016.
  */
 public class BuildableLedgerField<T extends Buildable> implements LedgerField<T> {
-    private BuildableDelta<T> delta;
+    private final BuildableDelta<T> delta;
 
     public BuildableLedgerField(BuildableDelta<T> delta) {
         this.delta = delta;

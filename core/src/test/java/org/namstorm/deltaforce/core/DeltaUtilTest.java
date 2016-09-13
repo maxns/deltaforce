@@ -1,12 +1,13 @@
 package org.namstorm.deltaforce.core;
 
 import junit.framework.TestCase;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import org.junit.Test;
 
 /**
  * Created by maxnamstorm on 6/8/2016.
@@ -37,7 +38,7 @@ public class DeltaUtilTest extends TestCase {
 
         deltaMap = new DeltaMap(Delta.OP.UPDATE, getName(), refSourceMap);
     }
-    Random rnd = new Random(System.currentTimeMillis());
+    private Random rnd = new Random(System.currentTimeMillis());
 
     public Map createMultiMap(int depth) {
         Map res = createMap();

@@ -2,10 +2,7 @@ package org.namstorm.deltaforce.samples.ledgers;
 
 import org.namstorm.deltaforce.ledgers.LedgerSchemaImpl;
 import org.namstorm.deltaforce.samples.ComplexPerson;
-import org.namstorm.deltaforce.samples.ledgers.model.Order;
 import org.namstorm.deltaforce.samples.ledgers.model.Orders;
-
-import java.util.List;
 
 /**
  * Created by maxnamstorm on 9/8/2016.
