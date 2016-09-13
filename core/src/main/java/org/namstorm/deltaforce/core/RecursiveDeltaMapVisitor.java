@@ -30,6 +30,6 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
     }
 
     protected void visitMap(DeltaMap<String, Delta<?>> deltaMap) {
-        deltaMap.values().forEach(d -> visit(d));
+        deltaMap.values().forEach(this::visit);
     }
 }

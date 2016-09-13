@@ -22,7 +22,7 @@ public @interface DeltaField {
         COLLECTION,
         /** access like a builder (FIELD + modify) */
         BUILDER
-    };
+    }
 
     /**
      * Set this to true and this field will be ignore

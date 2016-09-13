@@ -8,7 +8,6 @@ import org.namstorm.deltaforce.samples.Person;
 import org.namstorm.deltaforce.samples.ledgers.model.SampleBuildableLedgerEntry;
 
 import static org.junit.Assert.*;
-import static org.junit.Assert.assertEquals;
 
 /**
  * Created by maxnamstorm on 16/8/2016.
@@ -104,7 +103,6 @@ public class SampleBuildableLedgerTest extends TestCase{
         assertEquals("author set correctly", complexPerson, entry.getAuthor());
 
         entry = ledger.open();
-;
 
         assertNotEquals("author not yet set correctly", complexPerson, entry.getAuthor());
 

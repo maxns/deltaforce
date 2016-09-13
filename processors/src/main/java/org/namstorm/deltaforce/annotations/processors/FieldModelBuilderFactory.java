@@ -1,8 +1,8 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
-import org.namstorm.deltaforce.annotations.DeltaField;
-import org.namstorm.deltaforce.annotations.processors.util.DFProcessorUtil;
+import java.lang.reflect.InvocationTargetException;
+import java.util.HashMap;
+import java.util.Map;
 
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
@@ -13,9 +13,10 @@ import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
-import java.lang.reflect.InvocationTargetException;
-import java.util.HashMap;
-import java.util.Map;
+
+import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
+import org.namstorm.deltaforce.annotations.processors.util.DFProcessorUtil;
 
 /**
  * Created by maxnamstorm on 10/8/2016.
@@ -34,7 +35,7 @@ public class FieldModelBuilderFactory {
     /**
      * Temporary hack, until we make this configurable
      */
-    private static Object[][] BUILDERS = {
+    private static final Object[][] BUILDERS = {
             {MapFieldModelBuilder.FIELD_BASE_CLASSES, MAP_FIELD_MODEL_BUILDER_CLASS},
             {FieldModelBuilder.FIELD_BASE_CLASSES, FIELD_MODEL_BUILDER_CLASS},
             {CollectionFieldModelBuilder.FIELD_BASE_CLASSES, COLLECTION_FIELD_MODEL_BUILDER_CLASS},
@@ -52,12 +53,12 @@ public class FieldModelBuilderFactory {
     private void initBuilderMap() {
         builderMap = new HashMap<>();
 
-        for(int i=0; i<BUILDERS.length; i++) {
-            Class<FieldModelBuilder> builderClass = (Class<FieldModelBuilder>) BUILDERS[i][1];
+        for (Object[] BUILDER : BUILDERS) {
+            Class<FieldModelBuilder> builderClass = (Class<FieldModelBuilder>) BUILDER[1];
 
-            Class[] builderFieldClasses = (Class[]) BUILDERS[i][0];
+            Class[] builderFieldClasses = (Class[]) BUILDER[0];
 
-            for(Class cs:builderFieldClasses) {
+            for (Class cs : builderFieldClasses) {
                 builderMap.put(cs.getName(), builderClass);
             }
         }
@@ -83,13 +84,7 @@ public class FieldModelBuilderFactory {
         try {
             return (VariableFieldModelBuilder) res.getConstructor(ProcessingEnvironment.class).newInstance(pe).with(e);
 
-        } catch (InstantiationException e1) {
-            log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
-            e1.printStackTrace();
-        } catch (IllegalAccessException e1) {
-            log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
-            e1.printStackTrace();
-        } catch (InvocationTargetException e1) {
+        } catch (InstantiationException | IllegalAccessException | InvocationTargetException e1) {
             log(pe, Diagnostic.Kind.ERROR, "Failed to instantiate:" + res + ", due to:" + e1, e);
             e1.printStackTrace();
         } catch (NoSuchMethodException e1) {

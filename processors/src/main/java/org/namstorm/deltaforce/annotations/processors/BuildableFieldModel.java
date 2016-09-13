@@ -4,7 +4,7 @@ package org.namstorm.deltaforce.annotations.processors;
  * Created by maxnam-storm on 15/8/2016.
  */
 public class BuildableFieldModel extends VariableFieldModel {
-    public static String TYPE_FIELD = "buildable";
+    public static final String TYPE_FIELD = "buildable";
 
     public String getBuilderPackage() {
         return builderPackage;

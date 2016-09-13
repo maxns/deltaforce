@@ -2,8 +2,6 @@ package org.namstorm.deltaforce.annotations.processors.util;
 
 import org.apache.velocity.util.StringUtils;
 
-import java.util.function.Consumer;
-
 /**
  * Created by maxnam-storm on 12/8/2016.
  *

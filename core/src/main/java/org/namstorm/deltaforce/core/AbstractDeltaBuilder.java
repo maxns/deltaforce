@@ -1,9 +1,9 @@
 package org.namstorm.deltaforce.core;
 
-import org.namstorm.fluency.OnBooleanResult;
-
 import java.util.Collection;
 import java.util.Map;
+
+import org.namstorm.fluency.OnBooleanResult;
 
 /**
  * Created by maxns on 5/8/2016.
@@ -12,7 +12,7 @@ import java.util.Map;
  *
  * @see @DeltaBuilder
  */
-public abstract class AbstractDeltaBuilder<T extends Object> implements DeltaBuilder<T> {
+public abstract class AbstractDeltaBuilder<T> implements DeltaBuilder<T> {
 
     private T from;
 

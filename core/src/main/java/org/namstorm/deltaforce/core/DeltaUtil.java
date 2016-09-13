@@ -55,10 +55,10 @@ public class DeltaUtil {
                         break;
                 }
             }
-        };
+        }
 
         private Map to;
-        private Stack<Map> toStack = new Stack<>();
+        private final Stack<Map> toStack = new Stack<>();
 
         public ApplyToMap(final Map toMap) {
             super();

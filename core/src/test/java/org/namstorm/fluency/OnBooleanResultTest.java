@@ -11,8 +11,6 @@ public class OnBooleanResultTest {
 
     @Test
     public void testBooleanLogic() {
-        boolean res;
-
         OnBooleanResult.FALSE
                 .onFalse(result -> assertTrue("false should be false", !result))
                 .onTrue(result -> fail("onTrue cannot be called from false"));
