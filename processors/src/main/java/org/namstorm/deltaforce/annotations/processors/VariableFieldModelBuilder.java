@@ -5,11 +5,12 @@ import java.util.List;
 import java.util.function.Consumer;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.Element;
 import javax.lang.model.element.Modifier;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
 
+import org.apache.velocity.util.StringUtils;
 import org.namstorm.deltaforce.annotations.DeltaField;
 import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
@@ -20,7 +21,9 @@ import static javax.tools.Diagnostic.Kind;
  * <p>
  * Builds field models
  */
-public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<VariableElement> {
+public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass> extends ModelBuilder<Element> {
+
+    private static final String GET = "get";
 
     public VariableFieldModelBuilder() {
         super();
@@ -127,6 +130,7 @@ public abstract class VariableFieldModelBuilder<M extends FieldModel, BaseClass>
         fieldModel.accessible = !element.getModifiers().contains(Modifier.PRIVATE);
 
         fieldModel.name = element.getSimpleName().toString();
+        fieldModel.accessorMethod = GET + StringUtils.capitalizeFirstLetter(fieldModel.name);
         fieldModel.alias = DFUtil.compileAlias(fieldModel.name, "");
         fieldModel.type = element.asType().toString();
 
