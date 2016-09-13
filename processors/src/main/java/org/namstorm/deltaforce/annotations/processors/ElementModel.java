@@ -8,9 +8,27 @@ import javax.lang.model.element.Element;
  */
 public interface ElementModel<T extends Element> {
 
+    /**
+     *
+     * @return
+     */
     boolean getAccessible();
 
+    /**
+     *
+     * @return
+     */
+    String getAccessor();
+
+    /**
+     *
+     * @return
+     */
     String getType();
 
+    /**
+     *
+     * @return
+     */
     String getName();
 }

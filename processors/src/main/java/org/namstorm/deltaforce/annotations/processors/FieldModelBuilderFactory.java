@@ -7,7 +7,6 @@ import java.util.Map;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
 import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.PrimitiveType;
 import javax.lang.model.type.TypeKind;
@@ -28,6 +27,8 @@ public class FieldModelBuilderFactory {
     public static final Class<FieldModelBuilder> FIELD_MODEL_BUILDER_CLASS = FieldModelBuilder.class;
 
     private static FieldModelBuilderFactory _instance;
+
+
     public static FieldModelBuilderFactory getInstance() {
         return _instance != null ? _instance : new FieldModelBuilderFactory();
     }
@@ -71,7 +72,7 @@ public class FieldModelBuilderFactory {
      * @param e
      * @return
      */
-    public VariableFieldModelBuilder create(ProcessingEnvironment pe, VariableElement e)  {
+    public VariableFieldModelBuilder create(ProcessingEnvironment pe, Element e)  {
 
         Class<? extends VariableFieldModelBuilder> res = matchBuilder(pe, e);
 
@@ -94,7 +95,7 @@ public class FieldModelBuilderFactory {
         return null;
     }
 
-    private String fmt(VariableElement e) {
+    private String fmt(Element e) {
         return e.toString()+"["+ String.join(",", e.getKind().toString(), e.asType().toString(), e.getSimpleName());
     }
 
@@ -108,17 +109,17 @@ public class FieldModelBuilderFactory {
      * @See autoMatchBuilder
      * @see org.namstorm.deltaforce.annotations.DeltaField.Type
      *
-     * @param variableElement
+     * @param element
      * @return
      */
-    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, VariableElement variableElement) {
-        Class<? extends VariableFieldModelBuilder> res = matchBuilderFomAnnotation(pe, variableElement);
+    public Class<? extends VariableFieldModelBuilder> matchBuilder(ProcessingEnvironment pe, Element element) {
+        Class<? extends VariableFieldModelBuilder> res = matchBuilderFomAnnotation(element);
 
         if(res!=null) {
             return res;
         }
 
-        TypeMirror typeMirror = variableElement.asType();
+        TypeMirror typeMirror = element.asType();
 
         typeMirror = autobox(pe, typeMirror);
 
@@ -130,15 +131,13 @@ public class FieldModelBuilderFactory {
     }
 
     /**
-     * Matches builder from annotation only
-     * @param pe
-     * @param variableElement
+     * @param element
      * @return
      */
     @SuppressWarnings(value = "unchecked")
-    private Class<? extends VariableFieldModelBuilder> matchBuilderFomAnnotation(ProcessingEnvironment pe, VariableElement variableElement) {
+    private Class<? extends VariableFieldModelBuilder> matchBuilderFomAnnotation(Element element) {
 
-        return (Class<? extends VariableFieldModelBuilder>) DFProcessorUtil.onAnnotations(variableElement, DeltaField.class, (Class) null)
+        return (Class<? extends VariableFieldModelBuilder>) DFProcessorUtil.onAnnotations(element, DeltaField.class, (Class) null)
                 .select(ann -> {
                     switch(ann.type()) {
                         case FIELD: return FIELD_MODEL_BUILDER_CLASS;
