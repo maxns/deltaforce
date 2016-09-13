@@ -14,12 +14,6 @@ public class DeltaBuilderTypeModel {
     /** The class simple alias. */
     String className;
 
-    /**
-     * The actual class that implements the interface className. May have same value as className if
-     * className is an actual class.
-     */
-    String classImplName;
-
     /** The class fully qualified alias. */
     String qualifiedName;
 
@@ -31,42 +25,12 @@ public class DeltaBuilderTypeModel {
 
     String implementsInterfaces;
 
-    boolean chainSetters = true;
-
-    boolean addOverrideForAccessors = false;
-
-    /**
-     * whether we should chain the setters to return the builder instance
-     *
-     * @param chainSetters
-     */
-    public void setChainSetters(boolean chainSetters) {
-        this.chainSetters = chainSetters;
-    }
-
-    /**
-     * whether to use the Override annotation on the accessors
-     *
-     * @param addOverrideForAccessors
-     */
-    public void setAddOverrideForAccessors(boolean addOverrideForAccessors) {
-        this.addOverrideForAccessors = addOverrideForAccessors;
-    }
-
     public void setPackageName(String packageName) {
         this.packageName = packageName;
     }
 
     public void setClassName(String className) {
         this.className = className;
-    }
-
-    /**
-     *
-     * @param classImplName
-     */
-    public void setClassImplName(String classImplName) {
-        this.classImplName = classImplName;
     }
 
     public void setQualifiedName(String qualifiedName) {
@@ -123,15 +87,6 @@ public class DeltaBuilderTypeModel {
     }
 
     /**
-     * Getter for classImplName property.
-     *
-     * @return
-     */
-    public String getClassImplName() {
-        return classImplName;
-    }
-
-    /**
      * Getter for qualifiedName property.
      *
      * @return the property value.
@@ -156,24 +111,6 @@ public class DeltaBuilderTypeModel {
      */
     public String getDeltaBuilderQualifiedName() {
         return deltaBuilderQualifiedName;
-    }
-
-    /**
-     * whether the generated class chains the Builder class on return type
-     *
-     * @return the property value
-     */
-    public boolean isChainSetters() {
-        return chainSetters;
-    }
-
-    /**
-     * Whether to add Override annotation for getters and setters
-     *
-     * @return the property value
-     */
-    public boolean isAddOverrideForAccessors() {
-        return addOverrideForAccessors;
     }
 
 }

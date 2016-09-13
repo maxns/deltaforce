@@ -13,6 +13,7 @@ public class VariableFieldModel implements FieldModel {
 
     String name;
 
+
     String alias;
     String type;
     String boxedType;
@@ -22,8 +23,6 @@ public class VariableFieldModel implements FieldModel {
     boolean accessible;
     boolean primitive;
 
-    String accessorMethod;
-
     @Override
     public String getBoxedType() {
         return boxedType;
@@ -32,11 +31,6 @@ public class VariableFieldModel implements FieldModel {
     @Override
     public boolean getAccessible() {
         return accessible;
-    }
-
-    @Override
-    public String getAccessor() {
-        return accessorMethod;
     }
 
     @Override

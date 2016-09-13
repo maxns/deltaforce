@@ -2,7 +2,6 @@
 package ${model.packageName};
 
 import org.namstorm.deltaforce.core.*;
-import org.namstorm.fluency.*;
 import javax.annotation.Generated;
 
 /**
@@ -20,5 +19,160 @@ public class $class_name
 extends ${model.extendClassName}
 #if(${model.implementsInterfaces} != "") implements ${model.implementsInterfaces} #end
 {
-    #parse( "DeltaBuilderBody.vm" )
+    public static final ${model.className} NULL_OBJECT = new ${model.className}();
+
+    public static ${model.className} create${model.className}() { return new ${model.className}(); }
+
+    public $class_name($model.className from) { super( from ); }
+    public $class_name() { super( NULL_OBJECT );}
+
+
+    @Override public ${model.className} create() { return (${model.className}) initBuilder( create${model.className}() ); }
+
+    @Override public $class_name from($model.className from) { super.from(from==null?NULL_OBJECT:from); return this; }
+    @Override public $class_name op(Delta.OP op) { super.op(op); return this; }
+
+    @Override public ${model.className} apply() { return applyTo(from()); }
+
+
+#foreach($field in $fields)
+    // AccessorType : ${field.accessorType}
+
+    #if( ${field.accessible} )
+        #set($from_value = "from().${field.name}")
+    #else
+        #set($from_value = "from().get${util.StringUtils.capitalizeFirstLetter($field.name)}()")
+    #end
+
+    #if( ${field.accessorType} == "field" )
+        #set ($alias = "${field.alias}")
+
+    /**
+    * Sets the value on the underlying and records a delta (if values are different)
+    *
+    * @return the property descriptor
+    */
+    public $class_name set$alias(final $field.type newValue) {
+        // first check if we already have a delta of this field
+        ${field.boxedType} curValue;
+
+        if(deltaMap().containsKey("${field.name}")) {
+            curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
+        }else {
+        #if( ${field.primitive} )
+            curValue = ${field.boxedType}.valueOf( from().get$alias() );
+        #else
+
+            curValue = $from_value;
+        #end
+        }
+
+        Delta.OP op = compare(curValue, newValue);
+
+        if(op != Delta.OP.NOOP) addDelta(new Delta(op, "${field.name}", curValue, newValue));
+
+        return this;
+    }
+    /** returns either a value tht's already been set or if none provided, previous value */
+    public ${field.type} get$alias() {
+        return deltaMap().containsKey("${field.name}") ? (${field.type}) delta("${field.name}").getNewValue()
+                                                        : $from_value;
+    }
+
+    #elseif( ${field.accessorType}=="map" )
+        #set ($alias = "${field.alias}")
+
+    public $class_name set$alias(final ${field.key.type} key, final ${field.value.type} value) {
+
+        ${field.value.boxedType} curValue =
+        #if( ${field.primitive} ) ${field.boxedType}.valueOf( from().get$alias(key) );
+        #else from().get$alias(key); #end
+
+        Delta.OP op = compare(curValue, value);
+
+        if(op!=Delta.OP.NOOP) addMapDelta("${field.name}", $from_value, new Delta(op, key, curValue, value));
+
+        return this;
+    }
+    #elseif (${field.accessorType}=="collection")
+
+    public $class_name add${field.alias}(final ${field.value.type} value) { addToCollection( "${field.name}", $from_value, value ); return this; }
+    public $class_name remove${field.alias}(final ${field.value.type} value) { removeFromCollection( "${field.name}", $from_value, value); return this; }
+
+    #elseif (${field.accessorType}=="buildable")
+
+    public ${field.builderFullClassName} get${field.alias}() {
+        BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
+
+        if(bd == null) {
+            bd = createBuildableDelta("${field.name}", $from_value, null, new ${field.builderFullClassName}() );
+            addDelta(bd);
+        }
+
+        return (${field.builderFullClassName}) ((BuildableDelta)delta("${field.name}")).getBuilder();
+    }
+    /** deletes the object (ie marks the delta to delete it) */
+    public $class_name delete${field.alias}() { return set${field.alias}(null); }
+    public $class_name create${field.alias}() { return set${field.alias}( get${field.alias}().create() ); }
+    public $class_name update${field.alias}() { return set${field.alias}( $from_value ); }
+
+
+    /** edits the value using a builder */
+    public $class_name set${field.alias}(final ${field.type} newValue) {
+        get${field.alias}(); // initialise hack
+
+        // let's see if we have the delta setup already
+        BuildableDelta<${field.type}> bd = ((BuildableDelta<${field.type}>) delta("${field.name}"));
+
+        bd.setOp(compare(bd.getOldValue(), newValue));
+        bd.setNewValue(newValue);
+
+        return this;
+    }
+    #end
+
+#end
+
+
+    /**
+    * apply deltas
+    * @Override
+    * @param to ${model.className} to apply deltas to
+    * @return ${model.className} to object with deltas applies
+    */
+    public ${model.className} applyTo(${model.className} to) {
+
+        #foreach($field in $fields)
+            #set ($alias = "${field.alias}")
+            #set ($name_part = "${util.StringUtils.capitalizeFirstLetter($field.name)}")
+
+            if(deltaMap().containsKey("${field.name}")){
+            #if( ${field.accessorType} == "field" )
+                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$name_part( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+            #elseif (${field.accessorType} == "map")
+                #if( ${field.accessible} )
+                delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set${name_part}( ($field.type) delta("${field.name}").applyTo( to.get${name_part}() ) );
+                #end
+            #elseif (${field.accessorType}=="collection")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set$name_part( (${field.type}) delta("${field.name}").applyTo(to.get$name_part()) );
+                #end
+            #elseif (${field.accessorType}=="buildable")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue());
+                #else
+                to.set$name_part( (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue()) );
+                #end
+            #end
+            }
+        #end
+
+        return to;
+
+    }
+
 }

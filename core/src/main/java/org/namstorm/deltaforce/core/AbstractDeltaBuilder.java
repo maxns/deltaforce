@@ -168,17 +168,6 @@ public abstract class AbstractDeltaBuilder<T> implements DeltaBuilder<T> {
         return new DeltaMap<>(Delta.OP.UPDATE, this.getClass().toString(),null);
     }
 
-    public DeltaMap<String, Delta<?>> getDeltaMap() {
-        return deltaMap;
-    }
-
-    public void setDeltaMap(DeltaMap<String, Delta<?>> map) {
-        deltaMap = map;
-    }
-
-    protected boolean containsDelta(String field) {
-        return deltaMap().containsKey(field);
-    }
 
     /**
      * Applies collected deltas to a new object (which gets created on the spot)
