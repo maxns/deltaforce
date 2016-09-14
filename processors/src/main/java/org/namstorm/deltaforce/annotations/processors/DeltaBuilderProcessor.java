@@ -357,7 +357,7 @@ public class DeltaBuilderProcessor
         Template vt = velocityEngine.getTemplate(template);
 
         JavaFileObject jfo = processingEnv.getFiler()
-                .createSourceFile(model.getDeltaBuilderClassName());
+                .createSourceFile(model.getDeltaBuilderQualifiedName());
 
         printNote("creating source file: " + jfo.toUri(), null);
 
