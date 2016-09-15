@@ -33,6 +33,17 @@ public interface DeltaBuilder<T> {
     T apply();
 
     /**
+     * same as apply() but also clear the deltas afterwards
+     * @return object that's been applied to
+     */
+    T applyAndClearDeltas();
+
+    /**
+     * clears out the deltas
+     */
+    void clearDeltas();
+
+    /**
      * creates a new object
      *
      * @see T .build()
