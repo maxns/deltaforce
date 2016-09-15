@@ -34,7 +34,7 @@ public class ClientOrderTest {
         order.setQuantity(1000);
         order.setId(123456789);
 
-        builder.rollback();
+        builder.clearDeltas();
 
         assertNull(order.getCurrencyCode());
         assertEquals(0, order.getQuantity(), 0.0);

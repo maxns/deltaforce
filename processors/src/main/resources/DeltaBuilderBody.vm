@@ -15,11 +15,11 @@
 
     @Override public ${model.className} applyAndClearDeltas() {
         ${model.className} result = apply();
-        rollback();
+        clearDeltas();
         return result;
     }
 
-    @Override public void rollback() {
+    @Override public void clearDeltas() {
         deltaMap().clear();
     }
 

@@ -144,4 +144,8 @@ public interface ClientOrder {
 
     void setFixOrder(boolean fixOrder);
 
+    int getSomeNumber123();
+
+    void setSomeNumber123(int value);
+
 }

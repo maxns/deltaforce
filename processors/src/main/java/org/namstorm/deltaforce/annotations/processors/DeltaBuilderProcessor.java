@@ -46,11 +46,11 @@ public class DeltaBuilderProcessor
 
     private static final String IMPL = "Impl";
 
-    private static final Pattern GETTER_PATTERN = Pattern.compile("^get([a-zA-Z]+)$");
+    private static final Pattern GETTER_PATTERN = Pattern.compile("^get([a-zA-Z0-9]+)$");
 
-    private static final Pattern SETTER_PATTERN = Pattern.compile("^set([a-zA-Z]+)$");
+    private static final Pattern SETTER_PATTERN = Pattern.compile("^set([a-zA-Z0-9]+)$");
 
-    private static final Pattern IS_PATTERN = Pattern.compile("^is([a-zA-Z]+)$");
+    private static final Pattern IS_PATTERN = Pattern.compile("^is([a-zA-Z0-9]+)$");
 
     /**
      * keeping it plain, avoiding Android issues

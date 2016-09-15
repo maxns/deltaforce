@@ -41,7 +41,7 @@ public interface DeltaBuilder<T> {
     /**
      * clears out the deltas
      */
-    void rollback();
+    void clearDeltas();
 
     /**
      * creates a new object
