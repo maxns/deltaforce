@@ -210,7 +210,7 @@ public class DeltaBuilderProcessor
             AttributeGroup group = entry.getValue();
             if (group.getRepresentingElement() != null) {
                 try {
-                    FieldModel field = createInterfaceModel(group.getRepresentingElement());
+                    FieldModel field = createInterfaceModel(group.getRepresentingElement(), group.setter != null);
 
                     fields.put(field.getName(), field);
 
@@ -320,8 +320,11 @@ public class DeltaBuilderProcessor
 
     }
 
-    private FieldModel createInterfaceModel(Element element) {
-        return MethodModelBuilderFactory.getInstance().create(processingEnv, element).build();
+    private FieldModel createInterfaceModel(Element element, boolean hasSetter) {
+        return MethodModelBuilderFactory.getInstance()
+                .create(processingEnv, element)
+                .setHasSetter(hasSetter)
+                .build();
     }
 
     /**
