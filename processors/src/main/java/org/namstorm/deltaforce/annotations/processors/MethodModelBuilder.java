@@ -17,6 +17,8 @@ class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
 
     private static final String GET = "get";
 
+    private boolean hasSetter = true;
+
     /**
      *
      * @param processingEnvironment
@@ -38,6 +40,10 @@ class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
         return res;
     }
 
+    MethodModelBuilder setHasSetter(boolean value) {
+        hasSetter = value;
+        return this;
+    }
 
     @Override
     public <A extends VariableFieldModel> A applyCommon(final A fieldModel) {
@@ -51,6 +57,7 @@ class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
 
         fieldModel.name = String.valueOf(fieldName.charAt(0)).toLowerCase() + fieldName.substring(1);
         fieldModel.accessorMethod = element.getSimpleName().toString();
+        fieldModel.hasSetter = hasSetter;
         fieldModel.alias = DFUtil.compileAlias(fieldModel.name, "");
         fieldModel.type = ((Symbol.MethodSymbol) element).getReturnType().toString();
 

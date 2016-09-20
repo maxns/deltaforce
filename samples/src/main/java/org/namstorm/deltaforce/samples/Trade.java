@@ -10,8 +10,6 @@ interface Trade {
 
     String getId();
 
-    void setId(String id);
-
     long getCreatedTime();
 
     void setCreatedTime(long createdTime);

@@ -56,7 +56,9 @@ extends ${model.extendClassName}
             #set ($alias = "${field.alias}")
             private $field.type ${field.name};
 
+            #if( ${field.hasSetter} )
             @Override
+            #end
             public void set$alias(final $field.type newValue) {
                 this.${field.name} = newValue;
             }

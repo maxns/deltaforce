@@ -56,7 +56,9 @@
     /**
     * Sets the value on the underlying and records a delta (if values are different)
     */
+    #if( ${field.hasSetter} )
     ${override}
+    #end
     public ${return_type} set$alias(final $field.type newValue) {
         // first check if we already have a delta of this field
         ${field.boxedType} curValue;
@@ -156,7 +158,13 @@
 
             if(deltaMap().containsKey("${field.name}")){
             #if( ${field.accessorType} == "field" )
+                #if( !$field.hasSetter )
+                if (to instanceof ${model.classImplName}) {
+                    ((${model.classImplName})to).#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$name_part( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+                }
+                #else
                 to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$name_part( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+                #end
             #elseif (${field.accessorType} == "map")
                 #if( ${field.accessible} )
                 delta("${field.name}").applyTo(to.${field.name});

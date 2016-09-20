@@ -21,6 +21,14 @@ public interface ElementModel<T extends Element> {
     String getAccessor();
 
     /**
+     * whether there is a setter defined.  If not, then it will not generate an
+     * @Override for the setter.
+     *
+     * @return
+     */
+    boolean getHasSetter();
+
+    /**
      *
      * @return
      */

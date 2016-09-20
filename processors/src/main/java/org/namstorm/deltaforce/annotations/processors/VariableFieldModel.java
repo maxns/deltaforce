@@ -23,6 +23,7 @@ public class VariableFieldModel implements FieldModel {
     boolean primitive;
 
     String accessorMethod;
+    boolean hasSetter = true;
 
     @Override
     public String getBoxedType() {
@@ -37,6 +38,11 @@ public class VariableFieldModel implements FieldModel {
     @Override
     public String getAccessor() {
         return accessorMethod;
+    }
+
+    @Override
+    public boolean getHasSetter() {
+        return hasSetter;
     }
 
     @Override
