@@ -18,6 +18,7 @@ import org.namstorm.deltaforce.core.*;
 *           or  .[setXXXAt(index, value)|removeXXXAt(index)|remove(value)]
 *          .[build()|apply()]
 */
+@SuppressWarnings("unused")
 @Generated(value="$generatorClassName", date="${date}")
 public class $class_name
 extends ${model.extendClassName}
