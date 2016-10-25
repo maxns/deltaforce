@@ -6,14 +6,13 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <artifactId>parent</artifactId>
+        <artifactId>deltaforce-parent</artifactId>
         <groupId>org.namstorm.deltaforce</groupId>
-        <version>1.0-SNAPSHOT</version>
+        <version>1.0.0-SNAPSHOT</version>
     </parent>
 
     <name>samples</name>
     <artifactId>deltaforce-samples</artifactId>
-    <version>1.0-SNAPSHOT</version>
 
     <properties>
         <jmh.version>1.12</jmh.version>
@@ -75,26 +74,26 @@
 
     <dependencies>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>deltaforce-annotations</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>deltaforce-annotations-processors</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>deltaforce-core</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
-            <groupId>${project.groupId}</groupId>
+            <groupId>org.namstorm.deltaforce</groupId>
             <artifactId>deltaforce-ledgers</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
 
         <dependency>
