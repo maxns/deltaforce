@@ -6,9 +6,7 @@ import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
  * Trade
  */
 @DeltaForceBuilder
-interface Trade {
-
-    String getId();
+interface Trade extends Identifiable {
 
     long getCreatedTime();
 

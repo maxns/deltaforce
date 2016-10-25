@@ -6,6 +6,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Properties;
 import java.util.Set;
@@ -182,15 +183,27 @@ public class DeltaBuilderProcessor
                 "annotating class: " + model.qualifiedName, elem);
 
         if (elem.getKind() == ElementKind.INTERFACE) {
-            collectMethods(classElement, fields);
+            collectMethods(classElement, fields, !annotation.ignoreInherited());
         } else {
             collectFields(classElement, fields, !annotation.ignoreInherited());
         }
     }
 
-    private void collectMethods(TypeElement elem, Map<String, FieldModel> fields) {
+    private void collectMethods(TypeElement elem, Map<String, FieldModel> fields, boolean recurse) {
         Map<String, AttributeGroup> attributeGroups = new HashMap<>();
 
+        if (recurse) {
+            if (elem.getSuperclass() != null) {
+                List<? extends TypeMirror> interfaces = elem.getInterfaces();
+                for (TypeMirror tm : interfaces) {
+                    DeclaredType superType = (DeclaredType) tm;
+                    TypeElement superElem = (TypeElement) superType.asElement();
+                    if (superElem != null) {
+                        collectMethods(superElem, fields, recurse);
+                    }
+                }
+            }
+        }
         for (Element ec : elem.getEnclosedElements()) {
             if (ec.getKind() == ElementKind.METHOD) {
                 DeltaField fea = ec.getAnnotation(DeltaField.class);
