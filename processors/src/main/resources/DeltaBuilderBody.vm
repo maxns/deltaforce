@@ -61,22 +61,26 @@
     #end
     public ${return_type} set$alias(final $field.type newValue) {
         // first check if we already have a delta of this field
-        ${field.boxedType} curValue;
 
         if(deltaMap().containsKey("${field.name}")) {
-            curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
+            ${field.boxedType} curValue = ($field.boxedType) deltaMap().get("${field.name}").getOldValue();
+            Delta.OP op = compare(curValue, newValue);
+            if(op != Delta.OP.NOOP) {
+                addDelta(new Delta(op, "${field.name}", curValue, newValue));
+            } else {
+                removeDelta("${field.name}");
+            }
         }else {
-        #if( ${field.primitive} )
-            curValue = ${field.boxedType}.valueOf( from().${field.accessor}() );
-        #else
-
-            curValue = $from_value;
-        #end
+            #if( ${field.primitive} )
+                ${field.boxedType} curValue = ${field.boxedType}.valueOf( from().${field.accessor}() );
+            #else
+                ${field.boxedType} curValue = $from_value;
+            #end
+            Delta.OP op = compare(curValue, newValue);
+            if(op != Delta.OP.NOOP) {
+                addDelta(new Delta(op, "${field.name}", curValue, newValue));
+            }
         }
-
-        Delta.OP op = compare(curValue, newValue);
-
-        if(op != Delta.OP.NOOP) addDelta(new Delta(op, "${field.name}", curValue, newValue));
 
         ${return_statement}
     }

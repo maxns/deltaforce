@@ -1,12 +1,12 @@
 package org.namstorm.deltaforce.samples;
 
-import org.junit.Test;
-import org.namstorm.deltaforce.core.Delta;
-import org.namstorm.deltaforce.core.DeltaMap;
-
 import static junit.framework.TestCase.assertFalse;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import org.junit.Test;
+import org.namstorm.deltaforce.core.Delta;
+import org.namstorm.deltaforce.core.DeltaMap;
 
 /**
  * ClientOrderTest
@@ -75,6 +75,25 @@ public class ClientOrderTest {
         assertEquals("HKD", another.getCurrencyCode());
         assertEquals(1000, another.getQuantity(), 0.0);
         assertEquals(123456789, another.getId());
+    }
+
+    @Test
+    public void testSetBackToOriginalValue() {
+        org.namstorm.deltaforce.samples.ClientOrderBuilder builder = new org.namstorm.deltaforce.samples.ClientOrderBuilder();
+        ClientOrder order = builder;
+
+        order.setPrice(3.0);
+        assertEquals(3.0, order.getPrice(), 0.0);
+
+        order.setPrice(0.0);
+        assertEquals(0.0, order.getPrice(), 0.0);
+
+        order.setCurrencyCode("HKD");
+        builder.applyAndClearDeltas();
+        order.setCurrencyCode("TWD");
+        assertEquals("TWD", order.getCurrencyCode());
+        order.setCurrencyCode("HKD");
+        assertEquals("HKD", order.getCurrencyCode());
     }
 
 }
