@@ -23,6 +23,10 @@ public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,
         map().put(fieldName, d);
     }
 
+    public void removeDelta(K fieldName) {
+        map().remove(fieldName);
+    }
+
     /**
      * applies delta to map
      *

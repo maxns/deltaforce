@@ -74,6 +74,10 @@ public abstract class AbstractDeltaBuilder<T> implements DeltaBuilder<T> {
         deltaMap.addDelta(delta.getFieldName(), delta);
     }
 
+    protected void removeDelta(String fieldName) {
+        deltaMap.removeDelta(fieldName);
+    }
+
     protected <TBuildable extends Buildable> void addDelta(BuildableDelta<TBuildable> delta, DeltaBuilder<TBuildable> builder) {
         addDelta(delta);
 
