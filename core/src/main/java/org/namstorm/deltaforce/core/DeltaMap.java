@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.core;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,7 +11,9 @@ import java.util.Set;
  *
  * It's a delta containing a map of deltas
  */
-public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,V>> implements Map<K,V> {
+public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,V>> implements Map<K,V>, Serializable {
+
+    private static final long serialVersionUID = 2805797696260756358L;
 
     public DeltaMap(OP op, K fieldName, Map oldValue) {
 

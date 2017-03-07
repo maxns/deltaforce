@@ -1,9 +1,14 @@
 package org.namstorm.deltaforce.core;
 
+import java.io.Serializable;
+
 /**
  * Created by maxns on 5/8/2016.
  */
-public class Delta<T> {
+public class Delta<T> implements Serializable{
+
+    private static final long serialVersionUID = -8507588398853728545L;
+
     public enum OP {
         ADD,
         REMOVE,

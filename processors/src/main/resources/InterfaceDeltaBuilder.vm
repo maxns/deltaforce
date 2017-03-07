@@ -1,6 +1,7 @@
 #set ($class_name = "${model.deltaBuilderClassName}")
 package ${model.packageName};
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.ArrayList;
 import javax.annotation.Generated;
@@ -34,7 +35,9 @@ extends ${model.extendClassName}
     #parse( "DeltaBuilderBody.vm" )
 
     @Generated(value="$generatorClassName", date="${date}")
-    private static final class ${model.classImplName} implements ${model.className}, Buildable<${model.className}, ${model.classImplName}.Builder> {
+    private static final class ${model.classImplName} implements ${model.className}, Buildable<${model.className}, ${model.classImplName}.Builder>, Serializable {
+
+        private static final long serialVersionUID = 1L;
 
         interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<${model.className}>{
         }
