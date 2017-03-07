@@ -60,8 +60,6 @@ public abstract class AbstractDeltaBuilder<T> implements DeltaBuilder<T> {
         return buildable;
     }
 
-
-
     public T from() {
         return from;
     }
