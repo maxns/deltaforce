@@ -13,7 +13,7 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
     }
 
     protected RecursiveDeltaMapVisitor() {
-
+        this.fieldVisitor = f -> {};
     }
 
     @Override
@@ -29,7 +29,7 @@ public class RecursiveDeltaMapVisitor implements DeltaVisitor{
         fieldVisitor.visit(delta);
     }
 
-    protected void visitMap(DeltaMap deltaMap) {
-        DeltaUtil.visitDeltas(deltaMap, this);
+    protected void visitMap(DeltaMap<String, Delta<?>> deltaMap) {
+        deltaMap.values().forEach(this::visit);
     }
 }

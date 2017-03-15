@@ -56,7 +56,7 @@ public class PersonTest extends TestCase {
         assertEquals(person.getGender(), GENDER);
 
 
-        Person to = builder.apply(new Person());
+        Person to = builder.from(new Person()).apply();
 
         assertEquals(person.getAge(), to.getAge());
         assertEquals(person.getFirstName(), to.getFirstName());

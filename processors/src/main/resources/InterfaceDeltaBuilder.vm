@@ -1,0 +1,95 @@
+#set ($class_name = "${model.deltaBuilderClassName}")
+package ${model.packageName};
+
+import java.io.Serializable;
+import java.util.List;
+import java.util.ArrayList;
+import javax.annotation.Generated;
+
+import org.namstorm.fluency.*;
+import org.namstorm.deltaforce.core.*;
+
+/**
+* Builder for $class_name
+*
+* @use  ${model.className} $class_name.[from(${model.className} start)]
+*               .[set]XXX(value) - for normal values
+*           or  .[set|clear]XXX(key, value) - for maps
+*           or  .[add|remove]XXX(value) - for sets
+*           or  .[setXXXAt(index, value)|removeXXXAt(index)|remove(value)]
+*          .[build()|apply()]
+*/
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
+@Generated(value="$generatorClassName", date="${date}")
+public class $class_name
+extends ${model.extendClassName}
+#if(${model.implementsInterfaces} != "") implements ${model.implementsInterfaces}, ${model.className}
+#elseif(${model.implementsInterfaces} == "") implements ${model.className}
+#end
+{
+    @Override
+    protected ${model.className} initBuilder(${model.className} buildable) {
+        return buildable;
+    }
+
+    #parse( "DeltaBuilderBody.vm" )
+
+    @Generated(value="$generatorClassName", date="${date}")
+    private static final class ${model.classImplName} implements ${model.className}, Buildable<${model.className}, ${model.classImplName}.Builder>, Serializable {
+
+        private static final long serialVersionUID = 1L;
+
+        interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<${model.className}>{
+        }
+
+        private transient Builder builder;
+
+        @Override
+        public Builder getBuilder() {
+            return builder;
+        }
+
+        @Override
+        public void setBuilder(Builder builder) {
+            this.builder = builder;
+        }
+
+    #foreach($field in $fields)
+
+        #if( ${field.accessorType} == "field" )
+            #set ($alias = "${field.alias}")
+            private $field.type ${field.name};
+
+            #if( ${field.hasSetter} )
+            @Override
+            #end
+            public void set$alias(final $field.type newValue) {
+                this.${field.name} = newValue;
+            }
+
+            @Override
+            public ${field.type} ${field.accessor}() {
+                return ${field.name};
+            }
+        #elseif( ${field.accessorType}=="map" )
+            #set ($alias = "${field.alias}")
+        @Override
+        public void set$alias(final ${field.key.type} key, final ${field.value.type} value) {
+            this.${field.name}.put(key, value);
+        }
+        #elseif (${field.accessorType}=="collection")
+        @Override
+        public void add${field.alias}(final ${field.value.type} value) {
+            this.${field.name}.add(value);
+        }
+
+        @Override
+        public void remove${field.alias}(final ${field.value.type} value) {
+            this.${field.name}.remove(value);
+        }
+        #end
+    #end
+
+    }
+
+}

@@ -1,12 +1,13 @@
 package org.namstorm.deltaforce.core;
 
 import junit.framework.TestCase;
-import org.junit.Test;
 
 import java.math.BigDecimal;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
+import org.junit.Test;
 
 /**
  * Created by maxnamstorm on 6/8/2016.
@@ -23,6 +24,8 @@ public class DeltaUtilTest extends TestCase {
     Map<String,Object> refSourceMap;
     Map<String,Object> refTargetMap;
     Map<String,Object> testMap;
+    Map<String,Object> testParentMap;
+
 
     @org.junit.Before
     public void setUp() throws Exception {
@@ -31,10 +34,11 @@ public class DeltaUtilTest extends TestCase {
         refTargetMap = new HashMap<>(refSourceMap);
 
         testMap = new HashMap<>();
+        testParentMap = new HashMap<>();
 
-        deltaMap = new DeltaMap(getName(), refSourceMap);
+        deltaMap = new DeltaMap(Delta.OP.UPDATE, getName(), refSourceMap);
     }
-    Random rnd = new Random(System.currentTimeMillis());
+    private Random rnd = new Random(System.currentTimeMillis());
 
     public Map createMultiMap(int depth) {
         Map res = createMap();
@@ -67,6 +71,7 @@ public class DeltaUtilTest extends TestCase {
 
         deltaMap.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.UPDATE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
 
+
         DeltaUtil.applyMapDeltas(deltaMap, testMap);
 
         assertEquals("Updated map value", TEST_UPDATE_VALUE, testMap.get(MAGIC_KEY));
@@ -95,7 +100,7 @@ public class DeltaUtilTest extends TestCase {
 
         DeltaMap deepDeltas;
 
-        deepDeltas = new DeltaMap(MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
+        deepDeltas = new DeltaMap(Delta.OP.UPDATE, MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
         deepDeltas.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.UPDATE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
 
         deltaMap.addDelta(MAGIC_MAP_KEY, deepDeltas);
@@ -103,7 +108,7 @@ public class DeltaUtilTest extends TestCase {
 
         assertEquals("Updated value", TEST_UPDATE_VALUE, ((Map)testMap.get(MAGIC_MAP_KEY)).get(MAGIC_KEY));
 
-        deepDeltas = new DeltaMap(MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
+        deepDeltas = new DeltaMap(Delta.OP.UPDATE,MAGIC_MAP_KEY, (Map) refSourceMap.get(MAGIC_MAP_KEY));
         deepDeltas.addDelta(MAGIC_KEY, new Delta<>(Delta.OP.REMOVE, MAGIC_KEY,refSourceMap.get(MAGIC_KEY),TEST_UPDATE_VALUE));
 
         deltaMap.addDelta(MAGIC_MAP_KEY, deepDeltas);

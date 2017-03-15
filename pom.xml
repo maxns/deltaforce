@@ -8,14 +8,15 @@
 
     <name>DeltaForce POJO Delta Framework</name>
     <groupId>org.namstorm.deltaforce</groupId>
-    <artifactId>parent</artifactId>
-    <version>1.0-SNAPSHOT</version>
+    <artifactId>deltaforce-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
 
     <modules>
         <module>annotations</module>
         <module>processors</module>
         <module>samples</module>
         <module>core</module>
+        <module>ledgers</module>
     </modules>
 
     <build>
@@ -31,4 +32,6 @@
             </plugin>
         </plugins>
     </build>
+
+
 </project>

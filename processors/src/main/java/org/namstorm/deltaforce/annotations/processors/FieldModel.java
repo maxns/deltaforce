@@ -1,47 +1,16 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import org.apache.commons.lang.builder.ToStringBuilder;
-import org.apache.commons.lang.builder.ToStringStyle;
+import javax.lang.model.element.VariableElement;
 
 /**
- * Created by maxnamstorm on 4/8/2016.
+ * Created by maxnam-storm on 10/8/2016.
  */
-public class FieldModel {
-    public static String TYPE_FIELD = "field";
+public interface FieldModel extends ElementModel<VariableElement>{
+    String getAccessorType();
 
-    public String getAccessorType() { return TYPE_FIELD; }
+    String getBoxedType();
 
-    String name;
-    String type;
-    String boxedType;
+    String getAlias();
 
-    boolean accessible;
-    boolean primitive;
-
-    public String getBoxedType() {
-        return boxedType;
-    }
-
-    public boolean isAccessible() {
-        return accessible;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    @Override
-    public String toString() {
-        return new ToStringBuilder(this)
-                .append("accessorType", getAccessorType())
-                .append("name", name)
-                .append("type", type)
-                .append("primitive", primitive)
-                .append("accessible", accessible)
-                .toString();
-    }
+    String getClassName();
 }
