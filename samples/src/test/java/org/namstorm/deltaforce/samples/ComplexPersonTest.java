@@ -2,6 +2,7 @@ package org.namstorm.deltaforce.samples;
 
 import junit.framework.TestCase;
 import org.junit.Test;
+import org.namstorm.deltaforce.core.Delta;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
@@ -13,39 +14,46 @@ public class ComplexPersonTest extends TestCase {
     public static final int VAL_INT = 2;
     public static final short VAL_SHORT = 3;
     public static final long VAL_LONG = 10_000;
-    public static final int[] VAL_INT_ARR = new int[]{VAL_INT, VAL_INT + 1, VAL_INT + 2};
     public static final String VAL_META_NAME = "metaName";
     public static final String VAL_META_VALUE = "metaValue";
     public static final String VAL_META_NAME2 = "metaName2";
     public static final String VAL_META_VALUE2 = "metaValue2";
+    public static final String VAL_NICKNAME1 = "nickName1";
+    public static final String VAL_NICKNAME2 = "nickName2";
 
 
     @Test
     public void testSetters() throws Exception {
         ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
+                .op(Delta.OP.ADD)
                 .setByteValue(VAL_BYTE)
                 .setDoubleValue(VAL_DOUBLE)
                 .setFloatValue(VAL_FLOAT)
                 .setIntValue(VAL_INT)
-                .setIntValues(VAL_INT_ARR)
+                .addNickName(VAL_NICKNAME1)
+                .addNickName(VAL_NICKNAME2)
                 .setShortValue(VAL_SHORT)
                 .setLongValue(VAL_LONG)
                 .setMetaValue(VAL_META_NAME,VAL_META_VALUE)
                 .build();
+
 
         assertEquals(VAL_BYTE, testPerson.getByteValue());
         assertEquals(VAL_DOUBLE, testPerson.getDoubleValue());
         assertEquals(VAL_FLOAT, testPerson.getFloatValue());
         assertEquals(VAL_INT, testPerson.getIntValue());
         assertEquals(VAL_SHORT, testPerson.getShortValue());
-        assertEquals(VAL_INT_ARR, testPerson.getIntValues());
+
+        assertTrue(VAL_NICKNAME1, testPerson.getNickNames().contains(VAL_NICKNAME1));
+        assertTrue(VAL_NICKNAME2, testPerson.getNickNames().contains(VAL_NICKNAME2));
+
         assertEquals(VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
 
         //now lets see if meta values survive
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .setMetaValue(VAL_META_NAME2, VAL_META_VALUE2)
-                .apply(testPerson);
+                .apply();
 
         assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
         assertEquals("New meta value setup", VAL_META_VALUE2, testPerson.getMetaValue(VAL_META_NAME2));
@@ -54,10 +62,61 @@ public class ComplexPersonTest extends TestCase {
 
         new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
                 .setMetaValue(VAL_META_NAME2, null)
-                .apply(testPerson);
+                .apply();
 
         assertEquals("Remained untouched", VAL_META_VALUE, testPerson.getMetaValue(VAL_META_NAME));
         assertNull("Nulling of " + VAL_META_NAME2, testPerson.getMetaValue(VAL_META_NAME2));
+
+
+    }
+
+    @Test
+    public void testCollections() throws Exception {
+        ComplexPerson testPerson = new org.namstorm.deltaforce.samples.ComplexPersonBuilder(new ComplexPerson())
+                .addNickName(VAL_NICKNAME1)
+                .addNickName(VAL_NICKNAME2)
+                .addRating(123)
+                .build();
+
+        assertTrue(VAL_NICKNAME1, testPerson.getNickNames().contains(VAL_NICKNAME1));
+        assertTrue(VAL_NICKNAME2, testPerson.getNickNames().contains(VAL_NICKNAME2));
+        assertTrue(VAL_NICKNAME2, testPerson.getRatingNumbers().contains(123));
+
+        //now lets see if removal works
+
+        new org.namstorm.deltaforce.samples.ComplexPersonBuilder(testPerson)
+                .removeNickName(VAL_NICKNAME1)
+                .apply();
+
+        // removed?
+        assertFalse(VAL_NICKNAME1 + " should not survive", testPerson.getNickNames().contains(VAL_NICKNAME1));
+
+        // survived?
+        assertTrue(VAL_NICKNAME2 + " should survive", testPerson.getNickNames().contains(VAL_NICKNAME2));
+
+
+
+
+    }
+    @Test
+    public void testBuildable() throws Exception {
+        org.namstorm.deltaforce.samples.ComplexPersonBuilder builder = new org.namstorm.deltaforce.samples.ComplexPersonBuilder();
+
+        builder.createBrother().getBrother().setFirstName("Alex").setAge(44);
+        builder.createPrivatePerson().getPrivatePerson().setFirstName("Mickey").setAge(50);
+        builder.setNonBuildingBrother(builder.createBrother().getBrother().build());
+
+        ComplexPerson testPerson = builder.build();
+
+        assertNotNull("brother", testPerson.brother);
+        assertNotNull("privatePerson", testPerson.getPrivatePerson());
+        assertNotNull("nonBuildingBrother", testPerson.getNonBuildingBrother());
+
+        assertEquals("Brother's Name", "Alex", testPerson.brother.getFirstName());
+        assertEquals("privatePerson", "Mickey", testPerson.getPrivatePerson().getFirstName());
+        assertEquals("nobBuildingBrother", "Alex", testPerson.getNonBuildingBrother().getFirstName());
+        assertNotSame("brother and non-building brother", testPerson.brother, testPerson.getNonBuildingBrother());
+
 
 
     }

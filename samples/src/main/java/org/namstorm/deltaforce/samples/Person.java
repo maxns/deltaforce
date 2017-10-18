@@ -1,7 +1,7 @@
 package org.namstorm.deltaforce.samples;
 
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
 
 /**
  * This JavaBean represents an Person in the On-line Store application.
@@ -9,15 +9,13 @@ import org.namstorm.deltaforce.annotations.DeltaBuilder;
  * @author deors
  * @version 1.0
  */
-@DeltaBuilder
+@DeltaForceBuilder
 public class Person {
     enum Gender {
         MALE,
         FEMALE,
         OTHER
     }
-
-    ;
 
     public String getFirstName() {
         return firstName;

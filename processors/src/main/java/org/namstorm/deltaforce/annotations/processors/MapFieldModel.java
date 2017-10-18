@@ -7,16 +7,13 @@ import org.apache.commons.lang.builder.ToStringBuilder;
  * <p>
  * This one will
  */
-public class MapFieldModel extends FieldModel {
+public class MapFieldModel extends VariableFieldModel {
     public static final String TYPE_MAP = "map";
     @Override
     public String getAccessorType() {
         return TYPE_MAP;
     }
 
-    public String getMapItem() {
-        return mapItem;
-    }
 
     public FieldModel getKey() {
         return key;
@@ -26,10 +23,8 @@ public class MapFieldModel extends FieldModel {
         return value;
     }
 
-    String mapItem;
-
-    FieldModel key;
-    FieldModel value;
+    VariableFieldModel key;
+    VariableFieldModel value;
 
     @Override
     public String toString() {

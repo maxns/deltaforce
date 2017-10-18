@@ -1,16 +1,34 @@
 package org.namstorm.deltaforce.samples;
 
-import org.namstorm.deltaforce.annotations.DeltaBuilder;
 import org.namstorm.deltaforce.annotations.DeltaField;
+import org.namstorm.deltaforce.annotations.DeltaForceBuilder;
+import org.namstorm.deltaforce.core.Buildable;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by maxnam-storm on 5/8/2016.
  */
-@DeltaBuilder
-public class ComplexPerson {
+@DeltaForceBuilder(implement = {"ComplexPerson.Builder"})
+public class ComplexPerson extends Person implements Buildable<ComplexPerson, ComplexPerson.Builder>{
+
+    interface Builder extends org.namstorm.deltaforce.core.DeltaBuilder<ComplexPerson>{
+
+    }
+
+    @DeltaField(ignore = true)
+    private transient Builder builder;
+
+    @Override
+    public Builder getBuilder() {
+        return builder;
+    }
+
+    @Override
+    public void setBuilder(Builder builder) {
+        this.builder = builder;
+    }
+
     public int getIntValue() {
         return intValue;
     }
@@ -35,9 +53,19 @@ public class ComplexPerson {
         return doubleValue;
     }
 
-    public int[] getValues() {
-        return intValues;
+    public String getMetaValue(String key) {
+        return metaValues.get(key);
     }
+
+
+    public List<String> getNickNames() {
+        return nickNames;
+    }
+
+    public Set<Number> getRatingNumbers() {
+        return ratingNumbers;
+    }
+
 
 
     int intValue;
@@ -46,31 +74,60 @@ public class ComplexPerson {
     byte byteValue;
     float floatValue;
     double doubleValue;
-    int[] intValues;
-    private int[] privateIntValues;
 
-    public void setPrivateIntValues(int[] privateIntValues) {
-        this.privateIntValues = privateIntValues;
-    }
+    @DeltaField(alias = "-s")
+    List<String> nickNames;
 
-    public int[] getIntValues() {
+    @DeltaField(alias = "rating")
+    Set<Number> ratingNumbers = new HashSet<>();
 
-        return intValues;
-    }
-
-    public int[] getPrivateIntValues() {
-        return privateIntValues;
-    }
 
     @DeltaField(ignore = true)
     Map transientMap;
 
-    @DeltaField(mapItem = "metaValue")
+    @DeltaField(alias = "metaValue")
     HashMap<String,String> metaValues = new HashMap<>();
 
-    public String getMetaValue(String key) {
-        return metaValues.get(key);
+    public HashMap<String, String> getPreferences() {
+        return preferences;
     }
 
+    public void setPreferences(HashMap<String, String> preferences) {
+        this.preferences = preferences;
+    }
+
+    @DeltaField(alias = "Preference")
+    private HashMap<String,String> preferences = new HashMap<>();
+
+    public String getPreference(String key) {
+        return preferences.get(key);
+    }
+
+
+    Person publicPerson;
+
+    public Person getPrivatePerson() {
+        return privatePerson;
+    }
+
+    public void setPrivatePerson(Person privatePerson) {
+        this.privatePerson = privatePerson;
+    }
+
+    private Person privatePerson;
+
+
+    ComplexPerson brother;
+
+    public ComplexPerson getNonBuildingBrother() {
+        return nonBuildingBrother;
+    }
+
+    public void setNonBuildingBrother(ComplexPerson nonBuildingBrother) {
+        this.nonBuildingBrother = nonBuildingBrother;
+    }
+
+    @DeltaField(type=DeltaField.Type.FIELD)
+    private ComplexPerson nonBuildingBrother;
 
 }

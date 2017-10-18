@@ -1,5 +1,6 @@
 package org.namstorm.deltaforce.core;
 
+import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
@@ -10,16 +11,34 @@ import java.util.Set;
  *
  * It's a delta containing a map of deltas
  */
-public class DeltaMap<K extends String, V extends Delta> extends Delta<Map<K,V>> implements Map<K,V> {
+public class DeltaMap<K extends String, V extends Delta<?>> extends Delta<Map<K,V>> implements Map<K,V>, Serializable {
 
-    public DeltaMap(K fieldName, Map oldValue) {
+    private static final long serialVersionUID = 2805797696260756358L;
 
-        super(OP.UPDATE, fieldName, oldValue, new HashMap<>());
+    public DeltaMap(OP op, K fieldName, Map oldValue) {
+
+        super(op, fieldName, oldValue, new HashMap<>());
     }
     protected Map<K, V> map() { return getNewValue(); }
 
+
     public void addDelta(K fieldName, V d) {
         map().put(fieldName, d);
+    }
+
+    public void removeDelta(K fieldName) {
+        map().remove(fieldName);
+    }
+
+    /**
+     * applies delta to map
+     *
+     * @param to
+     */
+    public Map<K,V> applyTo(Map<K,V> to) {
+
+        return DeltaUtil.applyMapDeltas(this, to);
+
     }
 
 
@@ -78,8 +97,8 @@ public class DeltaMap<K extends String, V extends Delta> extends Delta<Map<K,V>>
         return map().values();
     }
 
-    public Collection<Delta> deltas() {
-        return (Collection<Delta>) map().values();
+    public Collection<V> deltas() {
+        return map().values();
     }
 
     @Override

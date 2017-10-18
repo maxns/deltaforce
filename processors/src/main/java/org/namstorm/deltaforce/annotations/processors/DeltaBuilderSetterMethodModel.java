@@ -1,7 +1,5 @@
 package org.namstorm.deltaforce.annotations.processors;
 
-import java.util.List;
-
 /**
  * Model for a method BeanInfo.
  *
@@ -10,7 +8,7 @@ import java.util.List;
  */
 public class DeltaBuilderSetterMethodModel {
 
-    /** Method name. */
+    /** Method alias. */
     String name;
 
     /** Method qualified arg type */
@@ -24,7 +22,7 @@ public class DeltaBuilderSetterMethodModel {
     }
 
     /**
-     * Getter for name property.
+     * Getter for alias property.
      *
      * @return the property value.
      */
