@@ -167,7 +167,7 @@ public abstract class AbstractDeltaBuilder<T> implements DeltaBuilder<T> {
      * @return
      */
     protected DeltaMap<String, Delta<?>> createDeltaMap() {
-        return new DeltaMap<>(Delta.OP.UPDATE, null,null);
+        return new DeltaMap<>(Delta.OP.UPDATE, this.getClass().toString(),null);
     }
 
     public DeltaMap<String, Delta<?>> getDeltaMap() {

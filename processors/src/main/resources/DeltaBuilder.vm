@@ -1,8 +1,6 @@
 #set ($class_name = "${model.deltaBuilderClassName}")
 package ${model.packageName};
 
-import java.util.Map;
-
 import org.namstorm.deltaforce.core.*;
 import org.namstorm.fluency.*;
 import javax.annotation.Generated;
@@ -17,7 +15,7 @@ import javax.annotation.Generated;
 *           or  .[setXXXAt(index, value)|removeXXXAt(index)|remove(value)]
 *          .[build()|apply()]
 */
-@SuppressWarnings("unused")
+@SuppressWarnings({"unused", "unchecked", "rawtypes"})
 @Generated(value="$generatorClassName", date="${date}")
 public class $class_name
 extends ${model.extendClassName}

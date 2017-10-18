@@ -155,48 +155,41 @@
     * @return ${model.className} to object with deltas applies
     */
     public ${model.className} applyTo(${model.className} to) {
-        final DeltaMap<String, Delta<?>> map = deltaMap();
 
-        for (Map.Entry<String, Delta<?>> entry : map.entrySet()) {
-            switch (entry.getKey()) {
-#foreach($field in $fields)
-                    #set ($alias = "${field.alias}")
-                    #set ($name_part = "${util.StringUtils.capitalizeFirstLetter($field.name)}")
-                case "${field.name}":
-#if( ${field.accessorType} == "field" )
-#if( !$field.hasSetter )
-                        if (to instanceof ${model.classImplName}) {
-                        ((${model.classImplName})to).#if( ${field.accessible} )${field.name} = (${field.boxedType}) entry.getValue().getNewValue(); #else set$name_part( (${field.boxedType}) entry.getValue().getNewValue() );#end
-                        }
-#else
-                        to.#if( ${field.accessible} )${field.name} = (${field.boxedType}) entry.getValue().getNewValue(); #else set$name_part( (${field.boxedType}) entry.getValue().getNewValue() );#end
-#end
-#elseif (${field.accessorType} == "map")
-                        #if( ${field.accessible} )
-                        delta("${field.name}").applyTo(to.${field.name});
-                        #else
-                        to.set${name_part}( ($field.type) delta("${field.name}").applyTo( to.get${name_part}() ) );
-                        #end
-#elseif (${field.accessorType}=="collection")
-                        #if( ${field.accessible} )
-                        to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
-                        #else
-                        to.set$name_part( (${field.type}) delta("${field.name}").applyTo(to.get$name_part()) );
-                        #end
-#elseif (${field.accessorType}=="buildable")
-                        #if( ${field.accessible} )
-                        to.${field.name} = (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue());
-                        #else
-                        to.set$name_part( (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue()) );
-                        #end
-#end
+        #foreach($field in $fields)
+            #set ($alias = "${field.alias}")
+            #set ($name_part = "${util.StringUtils.capitalizeFirstLetter($field.name)}")
 
-                    break;
-#end
-                default:
-                    // do nothing
+            if(deltaMap().containsKey("${field.name}")){
+            #if( ${field.accessorType} == "field" )
+                #if( !$field.hasSetter )
+                if (to instanceof ${model.classImplName}) {
+                    ((${model.classImplName})to).#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$name_part( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+                }
+                #else
+                to.#if( ${field.accessible} )${field.name} = ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue(); #else set$name_part( ((Delta<${field.boxedType}>) deltaMap().get("${field.name}")).getNewValue() );#end
+                #end
+            #elseif (${field.accessorType} == "map")
+                #if( ${field.accessible} )
+                delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set${name_part}( ($field.type) delta("${field.name}").applyTo( to.get${name_part}() ) );
+                #end
+            #elseif (${field.accessorType}=="collection")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(to.${field.name});
+                #else
+                to.set$name_part( (${field.type}) delta("${field.name}").applyTo(to.get$name_part()) );
+                #end
+            #elseif (${field.accessorType}=="buildable")
+                #if( ${field.accessible} )
+                to.${field.name} = (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue());
+                #else
+                to.set$name_part( (${field.type}) delta("${field.name}").applyTo(delta("${field.name}").getNewValue()) );
+                #end
+            #end
             }
-        }
+        #end
 
         return to;
 
