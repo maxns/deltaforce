@@ -1,17 +1,17 @@
 package org.namstorm.deltaforce.annotations.processors;
 
 import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.type.TypeMirror;
 import javax.tools.Diagnostic;
 
 import org.namstorm.deltaforce.annotations.DeltaField;
 import org.namstorm.deltaforce.annotations.processors.util.DFUtil;
 
-import com.sun.tools.javac.code.Symbol;
-
 /**
  * MethodModelBuilder
  */
-class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
+class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel, Object> {
 
     private static final String IS = "is";
 
@@ -35,7 +35,7 @@ class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
 
         res = applyCommon(res);
 
-        res = box(res, ((Symbol.MethodSymbol) element).getReturnType());
+        res = box(res, element.accept(returnTypeVisitor, null));
 
         return res;
     }
@@ -55,19 +55,30 @@ class MethodModelBuilder extends VariableFieldModelBuilder<FieldModel,Object> {
         else if (fieldName.startsWith(IS))
             fieldName = fieldName.substring(2);
 
-        fieldModel.name = String.valueOf(fieldName.charAt(0)).toLowerCase() + fieldName.substring(1);
+        fieldModel.name = String.valueOf(fieldName.charAt(0)).toLowerCase()
+                + fieldName.substring(1);
         fieldModel.accessorMethod = element.getSimpleName().toString();
         fieldModel.hasSetter = hasSetter;
         fieldModel.alias = DFUtil.compileAlias(fieldModel.name, "");
-        fieldModel.type = ((Symbol.MethodSymbol) element).getReturnType().toString();
+        fieldModel.type = element.accept(returnTypeVisitor, null).toString();
 
-        box(fieldModel, ((Symbol.MethodSymbol) element).getReturnType());
+        box(fieldModel, element.accept(returnTypeVisitor, null));
 
-        onAnnotation(DeltaField.class, a -> fieldModel.alias = DFUtil.compileAlias(fieldModel.name, a.alias()) );
+        onAnnotation(DeltaField.class,
+                a -> fieldModel.alias = DFUtil.compileAlias(fieldModel.name, a.alias()));
 
         printMessage(Diagnostic.Kind.NOTE, "created field model:" + fieldModel.toString());
 
         return fieldModel;
+    }
+
+    private static final ReturnTypeVisitor returnTypeVisitor = new ReturnTypeVisitor();
+
+    private static class ReturnTypeVisitor extends ElementVisitorAdapter {
+        @Override
+        public TypeMirror visitExecutable(ExecutableElement e, Void p) {
+            return e.getReturnType();
+        }
     }
 
 }
