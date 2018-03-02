@@ -71,7 +71,7 @@ public class DeltaCollection<T> extends Delta<Collection> implements Collection<
 
     @Override
     public boolean contains(Object o) {
-        return getNewValue().contains(0);
+        return getNewValue().contains(o);
     }
 
     @Override
